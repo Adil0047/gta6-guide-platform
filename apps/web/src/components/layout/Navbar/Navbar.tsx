@@ -1,0 +1,118 @@
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { Menu, Search, X } from 'lucide-react';
+import { useCallback, useId, useState } from 'react';
+import { Link } from 'react-router';
+
+import { Button } from '@/components/ui/Button';
+import { ROUTES } from '@/constants/routes';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useEscapeKey } from '@/hooks/useEscapeKey';
+import { useScrollPosition } from '@/hooks/useScrollPosition';
+import { cn } from '@/utils/cn';
+
+import { DesktopNavLink } from './DesktopNavLink';
+import { MobileNavLink } from './MobileNavLink';
+import { NAVBAR_LINKS } from './navbar.constants';
+import { NavbarLogo } from './NavbarLogo';
+import { type NavbarProps } from './navbar.types';
+
+export function Navbar({ className }: NavbarProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const hasScrolled = useScrollPosition(8);
+  const mobileMenuId = useId();
+  const shouldReduceMotion = useReducedMotion();
+
+  const closeMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
+
+  useBodyScrollLock(isMenuOpen);
+  useEscapeKey({ enabled: isMenuOpen, onEscape: closeMenu });
+
+  return (
+    <header
+      className={cn(
+        'sticky top-0 z-50 w-full border-b transition duration-300',
+        hasScrolled
+          ? 'border-white/10 bg-background/80 shadow-[0_18px_80px_rgba(0,0,0,0.42)] backdrop-blur-xl'
+          : 'border-transparent bg-background/60 backdrop-blur-md',
+        className,
+      )}
+    >
+      <nav
+        aria-label="Primary navigation"
+        className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+      >
+        <NavbarLogo />
+
+        <div className="hidden items-center rounded-full border border-white/10 bg-white/[0.035] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] lg:flex">
+          {NAVBAR_LINKS.map((link) => (
+            <DesktopNavLink key={link.href} {...link} />
+          ))}
+        </div>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          <Link
+            to={ROUTES.search}
+            aria-label="Open search"
+            className="inline-flex size-11 items-center justify-center rounded-full bg-white/[0.05] text-text-secondary ring-1 ring-white/10 transition hover:bg-white/[0.09] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <Search aria-hidden className="size-4" />
+          </Link>
+
+          <Link
+            to={ROUTES.login}
+            className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Sign In
+          </Link>
+        </div>
+
+        <Button
+          variant="icon"
+          className="lg:hidden"
+          aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={isMenuOpen}
+          aria-controls={mobileMenuId}
+          onClick={() => {
+            setIsMenuOpen((current) => !current);
+          }}
+        >
+          {isMenuOpen ? (
+            <X aria-hidden className="size-5" />
+          ) : (
+            <Menu aria-hidden className="size-5" />
+          )}
+        </Button>
+      </nav>
+
+      <AnimatePresence>
+        {isMenuOpen ? (
+          <motion.div
+            id={mobileMenuId}
+            key="mobile-navigation"
+            initial={shouldReduceMotion ? false : { opacity: 0, y: -12 }}
+            animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="border-t border-white/10 bg-background/95 px-4 pb-6 pt-3 backdrop-blur-xl lg:hidden"
+          >
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-3">
+              {NAVBAR_LINKS.map((link) => (
+                <MobileNavLink key={link.href} {...link} onClick={closeMenu} />
+              ))}
+
+              <Link
+                to={ROUTES.login}
+                onClick={closeMenu}
+                className="mt-2 inline-flex min-h-14 items-center justify-center rounded-2xl bg-white px-5 text-base font-semibold text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                Sign In
+              </Link>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </header>
+  );
+}

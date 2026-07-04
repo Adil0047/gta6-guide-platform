@@ -1,0 +1,39 @@
+{
+  "name": "gta6-guide-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:web": "pnpm --filter @gta6-guide/web dev",
+    "dev:api": "pnpm --filter @gta6-guide/api dev",
+    "build": "pnpm -r build",
+    "build:web": "pnpm --filter @gta6-guide/web build",
+    "build:api": "pnpm --filter @gta6-guide/api build",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "typecheck": "pnpm -r typecheck",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "postinstall": "pnpm --filter @gta6-guide/shared build",
+    "predev": "pnpm --filter @gta6-guide/shared build",
+    "predev:web": "pnpm --filter @gta6-guide/shared build",
+    "predev:api": "pnpm --filter @gta6-guide/shared build"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.31.0",
+    "eslint": "9.31.0",
+    "eslint-config-prettier": "10.1.5",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "eslint-plugin-react-refresh": "0.4.20",
+    "globals": "16.3.0",
+    "prettier": "3.6.2",
+    "typescript-eslint": "8.35.1"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
