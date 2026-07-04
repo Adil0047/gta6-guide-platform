@@ -35,3 +35,5 @@ export {
 } from './user.controller.js';
 
 export { adminOverviewController } from './admin.controller.js';
+export * from './bookmark.controller.js';
+export * from './comment.controller.js';

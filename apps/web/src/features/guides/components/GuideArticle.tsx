@@ -1,10 +1,16 @@
-import { Bookmark, CheckCircle2, MessageCircle } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Bookmark, CheckCircle2, MessageCircle, Send } from 'lucide-react';
+import { useState } from 'react';
 
 import { GuideCard } from '@/components/cards';
 import { SectionHeader } from '@/components/common';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Textarea } from '@/components/ui/Textarea';
+import { getAuthSession } from '@/features/auth/authSession';
+import { bookmarkService, commentService, queryKeys } from '@/services';
 import { type Guide } from '@/types/content';
+import { formatDate } from '@/utils/formatDate';
 import { GuideTableOfContents } from './GuideTableOfContents';
 
 type GuideArticleProps = {
@@ -13,9 +19,50 @@ type GuideArticleProps = {
 };
 
 export function GuideArticle({ guide, allGuides }: GuideArticleProps) {
+  const [commentBody, setCommentBody] = useState('');
+  const queryClient = useQueryClient();
+  const session = getAuthSession();
+  const isAuthenticated = Boolean(session);
+
+  const bookmarkStatusQuery = useQuery({
+    queryKey: queryKeys.bookmarkStatus(guide.id),
+    queryFn: () => bookmarkService.getBookmarkStatus(guide.id),
+    enabled: isAuthenticated,
+  });
+  const commentsQuery = useQuery({
+    queryKey: queryKeys.guideComments(guide.id, { limit: 20 }),
+    queryFn: () => commentService.listGuideComments(guide.id, { limit: 20 }),
+  });
+
+  const toggleBookmarkMutation = useMutation({
+    mutationFn: async () => {
+      if (bookmarkStatusQuery.data?.isBookmarked) {
+        await bookmarkService.deleteBookmark(guide.id);
+        return false;
+      }
+
+      await bookmarkService.createBookmark(guide.id);
+      return true;
+    },
+    onSuccess: (isBookmarked) => {
+      queryClient.setQueryData(queryKeys.bookmarkStatus(guide.id), { isBookmarked });
+      void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+    },
+  });
+
+  const createCommentMutation = useMutation({
+    mutationFn: commentService.createComment,
+    onSuccess: () => {
+      setCommentBody('');
+      void queryClient.invalidateQueries({ queryKey: queryKeys.myComments({ limit: 3 }) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.myComments({ limit: 50 }) });
+    },
+  });
+
   const relatedGuides = allGuides
     .filter((candidate) => candidate.slug !== guide.slug && candidate.categorySlug === guide.categorySlug)
     .slice(0, 4);
+  const isBookmarked = Boolean(bookmarkStatusQuery.data?.isBookmarked);
 
   return (
     <section className="pb-20">
@@ -67,15 +114,30 @@ export function GuideArticle({ guide, allGuides }: GuideArticleProps) {
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button>
+              <Button
+                onClick={() => {
+                  if (isAuthenticated) {
+                    toggleBookmarkMutation.mutate();
+                  }
+                }}
+                disabled={!isAuthenticated || toggleBookmarkMutation.isPending || bookmarkStatusQuery.isLoading}
+              >
                 <Bookmark aria-hidden className="mr-2 size-4" />
-                Save guide
+                {isBookmarked ? 'Saved guide' : 'Save guide'}
               </Button>
-              <Button variant="ghost">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  document.getElementById('guide-comments')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
                 <MessageCircle aria-hidden className="mr-2 size-4" />
                 Discuss guide
               </Button>
             </div>
+            {!isAuthenticated ? (
+              <p className="mt-3 text-sm text-text-muted">Sign in to save this guide or post a comment.</p>
+            ) : null}
           </Card>
 
           {guide.faqs.length > 0 ? (
@@ -95,6 +157,81 @@ export function GuideArticle({ guide, allGuides }: GuideArticleProps) {
               </div>
             </div>
           ) : null}
+
+          <div id="guide-comments" className="mt-10 scroll-mt-28">
+            <SectionHeader
+              eyebrow="Community"
+              title="Guide comments"
+              description="Approved comments are shown here. New comments are saved to the backend and sent for moderation."
+            />
+            <Card className="mt-6 p-6">
+              {isAuthenticated ? (
+                <form
+                  className="grid gap-4"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const trimmedComment = commentBody.trim();
+
+                    if (trimmedComment.length === 0) {
+                      return;
+                    }
+
+                    createCommentMutation.mutate({ guideId: guide.id, body: trimmedComment });
+                  }}
+                >
+                  <Textarea
+                    value={commentBody}
+                    onChange={(event) => {
+                      setCommentBody(event.target.value);
+                    }}
+                    placeholder="Share a useful note about this guide…"
+                    maxLength={1200}
+                  />
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-xs text-text-muted">Comments appear publicly after admin approval.</p>
+                    <Button type="submit" disabled={createCommentMutation.isPending || commentBody.trim().length < 2}>
+                      <Send aria-hidden className="mr-2 size-4" />
+                      Submit comment
+                    </Button>
+                  </div>
+                  {createCommentMutation.isSuccess ? (
+                    <p className="rounded-2xl border border-neon-cyan/20 bg-neon-cyan/10 px-4 py-3 text-sm text-neon-cyan">
+                      Comment submitted for moderation.
+                    </p>
+                  ) : null}
+                </form>
+              ) : (
+                <p className="text-sm leading-7 text-text-secondary">Sign in to join the discussion.</p>
+              )}
+            </Card>
+
+            <div className="mt-6 space-y-4">
+              {commentsQuery.isLoading ? <p className="text-sm text-text-secondary">Loading comments…</p> : null}
+              {commentsQuery.data?.items.map((comment) => (
+                <Card key={comment.id} className="p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-white">
+                        {comment.user?.name ?? comment.user?.username ?? 'Community member'}
+                      </p>
+                      <p className="mt-1 text-xs text-text-muted">{formatDate(comment.createdAt)}</p>
+                    </div>
+                    {comment.isEdited ? (
+                      <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-text-muted">
+                        edited
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-4 text-sm leading-7 text-text-secondary">{comment.body}</p>
+                </Card>
+              ))}
+              {!commentsQuery.isLoading && !commentsQuery.data?.items.length ? (
+                <p className="rounded-card border border-white/10 bg-white/[0.04] p-5 text-sm text-text-secondary">
+                  No approved comments yet.
+                </p>
+              ) : null}
+            </div>
+          </div>
 
           {relatedGuides.length > 0 ? (
             <div className="mt-10">

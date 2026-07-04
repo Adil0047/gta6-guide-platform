@@ -1,6 +1,22 @@
 export { changePasswordSchema, loginSchema, registerSchema } from './auth.validators.js';
 
 export {
+  bookmarkGuideSchema,
+  createBookmarkSchema,
+  deleteBookmarkSchema,
+  listBookmarksSchema,
+} from './bookmark.validators.js';
+
+export {
+  createCommentSchema,
+  deleteCommentSchema,
+  guideCommentsSchema,
+  listCommentsSchema,
+  updateCommentSchema,
+  updateCommentStatusSchema,
+} from './comment.validators.js';
+
+export {
   createCategorySchema,
   getCategoryByIdSchema,
   getCategoryBySlugSchema,

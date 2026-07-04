@@ -37,3 +37,20 @@ export {
 } from './user.service.js';
 
 export { createAuditLog, listAuditLogs } from './audit.service.js';
+
+export {
+  createBookmark,
+  deleteBookmark,
+  getBookmarkStatus,
+  listBookmarks,
+} from './bookmark.service.js';
+
+export {
+  createComment,
+  deleteComment,
+  listComments,
+  listGuideComments,
+  listMyComments,
+  updateComment,
+  updateCommentStatus,
+} from './comment.service.js';

@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
-    "predev": "pnpm --filter @gta6-guide/shared build"
+    "predev": "pnpm --filter @gta6-guide/shared build",
+    "seed": "tsx --tsconfig tsconfig.json src/scripts/seed.ts"
   },
   "dependencies": {
     "@gta6-guide/shared": "workspace:*",

@@ -1,3 +1,5 @@
+export { BookmarkModel } from './Bookmark.model.js';
+export { CommentModel } from './Comment.model.js';
 export { AuditLogModel } from './AuditLog.model.js';
 export { CategoryModel } from './Category.model.js';
 export { GuideModel } from './Guide.model.js';

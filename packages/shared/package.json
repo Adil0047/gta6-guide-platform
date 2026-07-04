@@ -41,6 +41,10 @@
     "./users": {
       "types": "./src/constants/users.ts",
       "import": "./dist/constants/users.js"
+    },
+    "./community": {
+      "types": "./src/constants/community.ts",
+      "import": "./dist/constants/community.js"
     }
   },
   "scripts": {

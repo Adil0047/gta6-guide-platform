@@ -1,15 +1,23 @@
-import { BookOpen, Eye, FolderTree, ShieldCheck, UserRound } from 'lucide-react';
+import { BookMarked, BookOpen, Eye, FolderTree, MessageCircle, UserRound } from 'lucide-react';
 
+import {
+  type CreateCategoryDto,
+  type CreateGuideDto,
+  type UpdateCategoryDto,
+  type UpdateGuideDto,
+  type UserDto,
+} from '@gta6-guide/shared/dto';
+import { type PaginationMeta } from '@gta6-guide/shared/pagination';
 import { type UserRole } from '@gta6-guide/shared/roles';
 import { type UserStatus } from '@gta6-guide/shared/users';
-import { type PaginationMeta } from '@gta6-guide/shared/pagination';
-import { type UserDto } from '@gta6-guide/shared/dto';
 
 import { apiClient } from '@/lib/apiClient';
 import { getAuthOptions } from '@/services/authHeaders';
 import {
   contentService,
+  normalizeCategory,
   normalizeGuide,
+  type MongoCategoryDto,
   type MongoGuideDto,
   type PaginatedResult,
 } from '@/services/contentService';
@@ -22,6 +30,9 @@ type AdminOverviewResponse = {
     publishedGuideCount: number;
     categoryCount: number;
     userCount: number;
+    bookmarkCount: number;
+    commentCount: number;
+    pendingCommentCount: number;
   };
   recentAuditLogs: Array<{
     _id?: string;
@@ -41,7 +52,7 @@ type UserListParams = {
   status?: UserStatus;
 };
 
-function createUserQueryString(params: UserListParams = {}) {
+function createQueryString(params: Record<string, string | number | boolean | undefined> = {}) {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
@@ -74,18 +85,18 @@ export function createAdminStats(stats: AdminOverviewResponse['stats']): Dashboa
       icon: FolderTree,
     },
     {
+      id: 'comments',
+      label: 'Comments',
+      value: String(stats.commentCount),
+      description: `${stats.pendingCommentCount} waiting for moderation.`,
+      icon: MessageCircle,
+    },
+    {
       id: 'registered-users',
       label: 'Users',
       value: String(stats.userCount),
       description: 'Active account records available to admins.',
       icon: UserRound,
-    },
-    {
-      id: 'system-health',
-      label: 'System health',
-      value: 'Live',
-      description: 'Admin overview API is responding.',
-      icon: ShieldCheck,
     },
   ];
 }
@@ -107,11 +118,18 @@ export function createAnalyticsStats(stats: AdminOverviewResponse['stats']): Das
       icon: Eye,
     },
     {
-      id: 'user-base',
-      label: 'User base',
-      value: String(stats.userCount),
-      description: 'Registered users available for dashboard growth.',
-      icon: UserRound,
+      id: 'saved-guides',
+      label: 'Saved guides',
+      value: String(stats.bookmarkCount),
+      description: 'Persisted user bookmark records.',
+      icon: BookMarked,
+    },
+    {
+      id: 'comments',
+      label: 'Comments',
+      value: String(stats.commentCount),
+      description: `${stats.pendingCommentCount} comments pending moderation.`,
+      icon: MessageCircle,
     },
   ];
 }
@@ -163,6 +181,26 @@ export const adminService = {
     };
   },
 
+  async listGuideRecords(): Promise<PaginatedResult<MongoGuideDto>> {
+    const response = await apiClient.getEnvelope<MongoGuideDto[], PaginationMeta>(
+      `/guides${createQueryString({ limit: 50, sort: 'latest' })}`,
+      getAuthOptions(),
+    );
+
+    return {
+      items: response.data ?? [],
+      meta: response.meta,
+    };
+  },
+
+  async createGuide(input: CreateGuideDto) {
+    return apiClient.post<MongoGuideDto>('/guides', input, getAuthOptions());
+  },
+
+  async updateGuide(id: string, input: UpdateGuideDto) {
+    return apiClient.patch<MongoGuideDto>(`/guides/${id}`, input, getAuthOptions());
+  },
+
   async deleteGuide(id: string) {
     return apiClient.delete<unknown>(`/guides/${id}`, getAuthOptions());
   },
@@ -171,13 +209,33 @@ export const adminService = {
     return contentService.listCategories({ limit: 50 });
   },
 
+  async listCategoryRecords(): Promise<PaginatedResult<MongoCategoryDto>> {
+    const response = await apiClient.getEnvelope<MongoCategoryDto[], PaginationMeta>(
+      `/categories${createQueryString({ limit: 50 })}`,
+      getAuthOptions(),
+    );
+
+    return {
+      items: response.data ?? [],
+      meta: response.meta,
+    };
+  },
+
+  async createCategory(input: CreateCategoryDto) {
+    return apiClient.post<MongoCategoryDto>('/categories', input, getAuthOptions());
+  },
+
+  async updateCategory(id: string, input: UpdateCategoryDto) {
+    return apiClient.patch<MongoCategoryDto>(`/categories/${id}`, input, getAuthOptions());
+  },
+
   async deleteCategory(id: string) {
     return apiClient.delete<unknown>(`/categories/${id}`, getAuthOptions());
   },
 
   async listUsers(params: UserListParams = {}): Promise<PaginatedResult<UserDto>> {
     const response = await apiClient.getEnvelope<UserDto[], PaginationMeta>(
-      `/users${createUserQueryString({ limit: 50, ...params })}`,
+      `/users${createQueryString({ limit: 50, ...params })}`,
       getAuthOptions(),
     );
 
@@ -190,4 +248,7 @@ export const adminService = {
   async updateUserStatus(id: string, status: UserStatus) {
     return apiClient.patch<UserDto>(`/users/${id}/status`, { status }, getAuthOptions());
   },
+
+  normalizeCategory,
+  normalizeGuide,
 };

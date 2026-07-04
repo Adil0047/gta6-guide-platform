@@ -27,7 +27,7 @@ import { type NavigationIcon } from '@/types/navigation';
 
 type MongoDate = string | Date | undefined;
 
-type MongoCategoryDto = Omit<CategoryDto, 'id' | 'createdAt' | 'updatedAt'> & {
+export type MongoCategoryDto = Omit<CategoryDto, 'id' | 'createdAt' | 'updatedAt'> & {
   _id?: string;
   id?: string;
   createdAt?: MongoDate;
@@ -52,7 +52,7 @@ type PopulatedUserDto = {
   role?: UserDto['role'] | string;
 };
 
-type MongoGuideDto = Omit<
+export type MongoGuideDto = Omit<
   GuideDto,
   'id' | 'categoryId' | 'authorId' | 'reviewerId' | 'publishedAt' | 'lastReviewedAt' | 'createdAt' | 'updatedAt'
 > & {
@@ -313,4 +313,4 @@ export const contentService = {
   createQueryString,
 };
 
-export type { GuideGameMetaDto, GuideMetricsDto, GuideSeoDto, MongoGuideDto };
+export type { GuideGameMetaDto, GuideMetricsDto, GuideSeoDto };

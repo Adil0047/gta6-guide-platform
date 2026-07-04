@@ -1,6 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
 
+import { BookmarkModel } from '@/models/Bookmark.model.js';
 import { CategoryModel } from '@/models/Category.model.js';
+import { CommentModel } from '@/models/Comment.model.js';
 import { GuideModel } from '@/models/Guide.model.js';
 import { UserModel } from '@/models/User.model.js';
 import { listAuditLogs } from '@/services/audit.service.js';
@@ -8,11 +10,23 @@ import { asyncHandler } from '@/utils/asyncHandler.js';
 import { sendResponse } from '@/utils/apiResponse.js';
 
 export const adminOverviewController = asyncHandler(async (_request, response) => {
-  const [guideCount, publishedGuideCount, categoryCount, userCount, auditLogs] = await Promise.all([
+  const [
+    guideCount,
+    publishedGuideCount,
+    categoryCount,
+    userCount,
+    bookmarkCount,
+    commentCount,
+    pendingCommentCount,
+    auditLogs,
+  ] = await Promise.all([
     GuideModel.countDocuments(),
     GuideModel.countDocuments({ status: 'published' }),
     CategoryModel.countDocuments(),
     UserModel.countDocuments({ status: { $ne: 'deleted' } }),
+    BookmarkModel.countDocuments(),
+    CommentModel.countDocuments(),
+    CommentModel.countDocuments({ status: 'pending' }),
     listAuditLogs(10),
   ]);
 
@@ -26,6 +40,9 @@ export const adminOverviewController = asyncHandler(async (_request, response) =
         publishedGuideCount,
         categoryCount,
         userCount,
+        bookmarkCount,
+        commentCount,
+        pendingCommentCount,
       },
       recentAuditLogs: auditLogs,
     },

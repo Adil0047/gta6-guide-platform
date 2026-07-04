@@ -18,7 +18,8 @@
     "postinstall": "pnpm --filter @gta6-guide/shared build",
     "predev": "pnpm --filter @gta6-guide/shared build",
     "predev:web": "pnpm --filter @gta6-guide/shared build",
-    "predev:api": "pnpm --filter @gta6-guide/shared build"
+    "predev:api": "pnpm --filter @gta6-guide/shared build",
+    "seed": "pnpm --filter @gta6-guide/api seed"
   },
   "devDependencies": {
     "@eslint/js": "9.31.0",

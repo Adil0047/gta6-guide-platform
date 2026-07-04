@@ -10,7 +10,6 @@ import {
   AdminStatGrid,
 } from '@/features/admin';
 import { adminService, createAdminStats, createGuideRecord, queryKeys } from '@/services';
-import { contentService } from '@/services/contentService';
 
 export function AdminDashboardPage() {
   const overviewQuery = useQuery({
@@ -19,7 +18,7 @@ export function AdminDashboardPage() {
   });
   const guidesQuery = useQuery({
     queryKey: queryKeys.guides({ limit: 5, sort: 'latest' }),
-    queryFn: () => contentService.listGuides({ limit: 5, sort: 'latest' }),
+    queryFn: adminService.listGuides,
   });
 
   const stats = overviewQuery.data ? createAdminStats(overviewQuery.data.stats) : [];

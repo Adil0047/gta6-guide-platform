@@ -7,18 +7,24 @@ import {
   type GuideType,
   type GuideVisibility,
 } from '../constants/content.js';
+import { type CommentStatus } from '../constants/community.js';
 import { type UserRole } from '../constants/roles.js';
 import { type ThemePreference, type UserStatus } from '../constants/users.js';
 import {
   type changePasswordBodySchema,
+  type createBookmarkBodySchema,
   type createCategoryBodySchema,
+  type createCommentBodySchema,
   type createGuideBodySchema,
+  type listBookmarksSchema,
   type listCategoriesSchema,
+  type listCommentsSchema,
   type listGuidesSchema,
   type listUsersSchema,
   type loginBodySchema,
   type registerBodySchema,
   type searchSchema,
+  type updateCommentBodySchema,
   type updateProfileBodySchema,
 } from '../schemas/index.js';
 
@@ -157,6 +163,37 @@ export type GuideDto = {
 };
 
 export type GuideSummaryDto = Pick<GuideDto, 'id' | 'title' | 'slug' | 'excerpt'>;
+
+export type CreateBookmarkDto = z.infer<typeof createBookmarkBodySchema>;
+
+export type BookmarkDto = {
+  id: string;
+  userId: string | UserDto;
+  guideId: string | GuideDto;
+  createdAt?: IsoDateString | Date;
+  updatedAt?: IsoDateString | Date;
+};
+
+export type ListBookmarksQueryDto = z.infer<typeof listBookmarksSchema>['query'];
+
+export type CreateCommentDto = z.infer<typeof createCommentBodySchema>;
+
+export type UpdateCommentDto = z.infer<typeof updateCommentBodySchema>;
+
+export type CommentDto = {
+  id: string;
+  guideId: string | GuideDto;
+  userId: string | UserDto;
+  parentId?: string | CommentDto;
+  body: string;
+  status: CommentStatus;
+  isEdited: boolean;
+  createdAt?: IsoDateString | Date;
+  updatedAt?: IsoDateString | Date;
+};
+
+export type ListCommentsQueryDto = z.infer<typeof listCommentsSchema>['query'];
+
 
 export type ListGuidesQueryDto = z.infer<typeof listGuidesSchema>['query'];
 

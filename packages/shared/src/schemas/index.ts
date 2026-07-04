@@ -41,6 +41,27 @@ export {
 export { searchSchema } from './search.js';
 
 export {
+  bookmarkGuideParamSchema,
+  bookmarkGuideSchema,
+  createBookmarkBodySchema,
+  createBookmarkSchema,
+  deleteBookmarkSchema,
+  listBookmarksSchema,
+} from './bookmark.js';
+
+export {
+  createCommentBodySchema,
+  createCommentSchema,
+  deleteCommentSchema,
+  guideCommentsSchema,
+  listCommentsSchema,
+  updateCommentBodySchema,
+  updateCommentSchema,
+  updateCommentStatusBodySchema,
+  updateCommentStatusSchema,
+} from './comment.js';
+
+export {
   listUsersSchema,
   updateProfileBodySchema,
   updateProfileSchema,

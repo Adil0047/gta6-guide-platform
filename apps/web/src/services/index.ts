@@ -6,6 +6,8 @@ export {
   createGuideRecord,
   createUserRecord,
 } from './adminService';
+export { bookmarkService, type BookmarkItem } from './bookmarkService';
+export { commentService, type CommentItem } from './commentService';
 export { authService } from './authService';
 export { contentService } from './contentService';
 export { queryKeys } from './queryKeys';

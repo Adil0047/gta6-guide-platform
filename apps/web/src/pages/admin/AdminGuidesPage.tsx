@@ -1,52 +1,157 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2 } from 'lucide-react';
+import { Edit3, Plus, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+import {
+  type GuideDifficulty,
+  type GuideStatus,
+  type GuideType,
+  type GuideVisibility,
+} from '@gta6-guide/shared/content';
 
 import { SEO } from '@/components/common';
 import { ErrorState } from '@/components/feedback';
+import { FormField } from '@/components/forms/FormField';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { Container } from '@/components/ui/Container';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 import { AdminPageHeader, AdminRecordTable } from '@/features/admin';
-import { adminService, createGuideRecord, queryKeys, type PaginatedResult } from '@/services';
-import { type Guide } from '@/types/content';
+import { adminService, createGuideRecord, queryKeys } from '@/services';
+import { type MongoGuideDto } from '@/services/contentService';
+
+const defaultGuideForm = {
+  id: '',
+  title: '',
+  slug: '',
+  excerpt: '',
+  content: '',
+  categoryId: '',
+  tags: '',
+  type: 'Beginner' as GuideType,
+  difficulty: 'Beginner' as GuideDifficulty,
+  status: 'draft' as GuideStatus,
+  visibility: 'public' as GuideVisibility,
+  readTime: 5,
+  isFeatured: false,
+};
+
+type GuideFormState = typeof defaultGuideForm;
+
+function getDocumentId(document: { id?: string; _id?: string }) {
+  return document.id ?? document._id ?? '';
+}
+
+function getRelationId(relation: string | { id?: string; _id?: string }) {
+  return typeof relation === 'string' ? relation : getDocumentId(relation);
+}
+
+function createGuideFormState(guide: MongoGuideDto): GuideFormState {
+  return {
+    id: getDocumentId(guide),
+    title: guide.title,
+    slug: guide.slug,
+    excerpt: guide.excerpt,
+    content: guide.content,
+    categoryId: getRelationId(guide.categoryId),
+    tags: guide.tags.join(', '),
+    type: guide.type,
+    difficulty: guide.difficulty,
+    status: guide.status,
+    visibility: guide.visibility,
+    readTime: guide.readTime,
+    isFeatured: guide.isFeatured,
+  };
+}
+
+function getTags(value: string) {
+  return value
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+}
 
 export function AdminGuidesPage() {
   const queryClient = useQueryClient();
-  const guidesKey = queryKeys.guides({ limit: 50, sort: 'latest' });
+  const [formState, setFormState] = useState<GuideFormState>(defaultGuideForm);
+  const [formMessage, setFormMessage] = useState('');
+  const guidesKey = queryKeys.guides({ limit: 50, sort: 'latest', admin: true });
+  const categoriesKey = queryKeys.categories({ limit: 50, admin: true });
   const guidesQuery = useQuery({
     queryKey: guidesKey,
-    queryFn: adminService.listGuides,
+    queryFn: adminService.listGuideRecords,
+  });
+  const categoriesQuery = useQuery({
+    queryKey: categoriesKey,
+    queryFn: adminService.listCategoryRecords,
+  });
+
+  const records = useMemo(
+    () => (guidesQuery.data?.items ?? []).map(adminService.normalizeGuide).map(createGuideRecord),
+    [guidesQuery.data?.items],
+  );
+  const categories = categoriesQuery.data?.items ?? [];
+  const effectiveCategoryId = formState.categoryId || getDocumentId(categories[0] ?? {});
+
+  const saveGuideMutation = useMutation({
+    mutationFn: () => {
+      const tags = getTags(formState.tags);
+      const payload = {
+        title: formState.title,
+        slug: formState.slug || undefined,
+        excerpt: formState.excerpt,
+        content: formState.content,
+        sections: [],
+        faqs: [],
+        categoryId: effectiveCategoryId,
+        tags,
+        tagIds: tags.map((tag) => tag.toLowerCase().replaceAll(' ', '-')),
+        type: formState.type,
+        difficulty: formState.difficulty,
+        status: formState.status,
+        visibility: formState.visibility,
+        coverImage: '',
+        readTime: Number(formState.readTime),
+        isFeatured: formState.isFeatured,
+        seo: {
+          metaTitle: formState.title,
+          metaDescription: formState.excerpt,
+          canonicalUrl: '',
+          keywords: tags,
+          ogImage: '',
+        },
+        gameMeta: {
+          missionName: '',
+          characterNames: [],
+          locationNames: [],
+          vehicleNames: [],
+          weaponNames: [],
+          platform: '',
+          gameVersion: '',
+        },
+      };
+
+      return formState.id ? adminService.updateGuide(formState.id, payload) : adminService.createGuide(payload);
+    },
+    onSuccess: () => {
+      setFormState(defaultGuideForm);
+      setFormMessage('Guide saved successfully.');
+      void queryClient.invalidateQueries({ queryKey: guidesKey });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminOverview });
+      void queryClient.invalidateQueries({ queryKey: ['guides'] });
+    },
   });
 
   const deleteGuideMutation = useMutation({
     mutationFn: adminService.deleteGuide,
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: guidesKey });
-      const previousGuides = queryClient.getQueryData<PaginatedResult<Guide>>(guidesKey);
-
-      queryClient.setQueryData<PaginatedResult<Guide>>(guidesKey, (current) =>
-        current
-          ? {
-              ...current,
-              items: current.items.filter((guide) => guide.id !== id),
-              meta: current.meta ? { ...current.meta, total: Math.max(current.meta.total - 1, 0) } : current.meta,
-            }
-          : current,
-      );
-
-      return { previousGuides };
-    },
-    onError: (_error, _id, context) => {
-      if (context?.previousGuides) {
-        queryClient.setQueryData(guidesKey, context.previousGuides);
-      }
-    },
-    onSettled: () => {
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: guidesKey });
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminOverview });
     },
   });
-
-  const records = (guidesQuery.data?.items ?? []).map(createGuideRecord);
 
   return (
     <>
@@ -57,16 +162,236 @@ export function AdminGuidesPage() {
             <AdminPageHeader
               eyebrow="Guide management"
               title="Guides"
-              description="Review, update, publish, and monitor editorial guide content through backend CRUD APIs."
+              description="Create, edit, publish, and delete editorial guide content through backend CRUD APIs."
             />
-            <button
-              type="button"
-              className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            <Button
+              onClick={() => {
+                setFormState(defaultGuideForm);
+                setFormMessage('');
+              }}
             >
               <Plus aria-hidden className="mr-2 size-4" />
               New guide
-            </button>
+            </Button>
           </div>
+
+          <Card className="mt-8 p-6">
+            <h2 className="text-xl font-black text-white">{formState.id ? 'Edit guide' : 'Create guide'}</h2>
+            <form
+              className="mt-6 grid gap-5 lg:grid-cols-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                setFormMessage('');
+                saveGuideMutation.mutate();
+              }}
+            >
+              <FormField label="Title">
+                {(id) => (
+                  <Input
+                    id={id}
+                    value={formState.title}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, title: event.target.value }));
+                    }}
+                    required
+                    minLength={5}
+                    maxLength={140}
+                  />
+                )}
+              </FormField>
+              <FormField label="Slug">
+                {(id) => (
+                  <Input
+                    id={id}
+                    value={formState.slug}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, slug: event.target.value }));
+                    }}
+                    placeholder="auto-generated when blank"
+                    maxLength={160}
+                  />
+                )}
+              </FormField>
+              <FormField label="Category">
+                {(id) => (
+                  <Select
+                    id={id}
+                    value={effectiveCategoryId}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, categoryId: event.target.value }));
+                    }}
+                    required
+                  >
+                    {categories.map((category) => (
+                      <option key={getDocumentId(category)} value={getDocumentId(category)}>
+                        {category.title}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </FormField>
+              <FormField label="Type">
+                {(id) => (
+                  <Select
+                    id={id}
+                    value={formState.type}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, type: event.target.value as GuideType }));
+                    }}
+                  >
+                    {['Mission', 'Map', 'Vehicle', 'Character', 'Money', 'Secrets', 'Online', 'Beginner'].map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </FormField>
+              <FormField label="Difficulty">
+                {(id) => (
+                  <Select
+                    id={id}
+                    value={formState.difficulty}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, difficulty: event.target.value as GuideDifficulty }));
+                    }}
+                  >
+                    {['Beginner', 'Intermediate', 'Advanced'].map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </FormField>
+              <FormField label="Status">
+                {(id) => (
+                  <Select
+                    id={id}
+                    value={formState.status}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, status: event.target.value as GuideStatus }));
+                    }}
+                  >
+                    {['draft', 'review', 'published', 'archived'].map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </FormField>
+              <FormField label="Visibility">
+                {(id) => (
+                  <Select
+                    id={id}
+                    value={formState.visibility}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, visibility: event.target.value as GuideVisibility }));
+                    }}
+                  >
+                    {['public', 'private', 'premium'].map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </FormField>
+              <FormField label="Read time">
+                {(id) => (
+                  <Input
+                    id={id}
+                    type="number"
+                    min={1}
+                    value={formState.readTime}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, readTime: Number(event.target.value) }));
+                    }}
+                  />
+                )}
+              </FormField>
+              <FormField label="Featured">
+                {(id) => (
+                  <Select
+                    id={id}
+                    value={formState.isFeatured ? 'true' : 'false'}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, isFeatured: event.target.value === 'true' }));
+                    }}
+                  >
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                  </Select>
+                )}
+              </FormField>
+              <FormField label="Tags">
+                {(id) => (
+                  <Input
+                    id={id}
+                    value={formState.tags}
+                    onChange={(event) => {
+                      setFormState((current) => ({ ...current, tags: event.target.value }));
+                    }}
+                    placeholder="missions, beginner, route"
+                  />
+                )}
+              </FormField>
+              <div className="lg:col-span-2">
+                <FormField label="Excerpt">
+                  {(id) => (
+                    <Textarea
+                      id={id}
+                      value={formState.excerpt}
+                      onChange={(event) => {
+                        setFormState((current) => ({ ...current, excerpt: event.target.value }));
+                      }}
+                      required
+                      minLength={20}
+                      maxLength={320}
+                    />
+                  )}
+                </FormField>
+              </div>
+              <div className="lg:col-span-2">
+                <FormField label="Content">
+                  {(id) => (
+                    <Textarea
+                      id={id}
+                      rows={8}
+                      value={formState.content}
+                      onChange={(event) => {
+                        setFormState((current) => ({ ...current, content: event.target.value }));
+                      }}
+                      required
+                      minLength={20}
+                    />
+                  )}
+                </FormField>
+              </div>
+              <div className="flex flex-wrap gap-3 lg:col-span-2">
+                <Button type="submit" disabled={saveGuideMutation.isPending || !effectiveCategoryId}>
+                  {formState.id ? 'Update guide' : 'Create guide'}
+                </Button>
+                {formState.id ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setFormState(defaultGuideForm);
+                      setFormMessage('');
+                    }}
+                  >
+                    Cancel edit
+                  </Button>
+                ) : null}
+              </div>
+              {formMessage ? <p className="text-sm text-neon-cyan lg:col-span-2">{formMessage}</p> : null}
+              {saveGuideMutation.isError ? (
+                <p className="text-sm text-danger lg:col-span-2">Guide save failed. Check required fields and unique slug.</p>
+              ) : null}
+            </form>
+          </Card>
 
           <div className="mt-8">
             {guidesQuery.isLoading ? (
@@ -90,17 +415,34 @@ export function AdminGuidesPage() {
                 title="Guide records"
                 records={records}
                 actions={(record) => (
-                  <button
-                    type="button"
-                    className="inline-flex h-9 items-center justify-center rounded-full border border-danger/20 bg-danger/10 px-3 text-xs font-semibold text-danger transition hover:bg-danger/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                    onClick={() => {
-                      deleteGuideMutation.mutate(record.id);
-                    }}
-                    disabled={deleteGuideMutation.isPending}
-                  >
-                    <Trash2 aria-hidden className="mr-2 size-4" />
-                    Delete
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="inline-flex h-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-text-secondary transition hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      onClick={() => {
+                        const rawGuide = guidesQuery.data?.items.find((item) => getDocumentId(item) === record.id);
+
+                        if (rawGuide) {
+                          setFormState(createGuideFormState(rawGuide));
+                          setFormMessage('');
+                        }
+                      }}
+                    >
+                      <Edit3 aria-hidden className="mr-2 size-4" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex h-9 items-center justify-center rounded-full border border-danger/20 bg-danger/10 px-3 text-xs font-semibold text-danger transition hover:bg-danger/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      onClick={() => {
+                        deleteGuideMutation.mutate(record.id);
+                      }}
+                      disabled={deleteGuideMutation.isPending}
+                    >
+                      <Trash2 aria-hidden className="mr-2 size-4" />
+                      Delete
+                    </button>
+                  </div>
                 )}
               />
             ) : null}
