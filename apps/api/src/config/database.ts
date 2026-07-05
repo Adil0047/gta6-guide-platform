@@ -1,7 +1,29 @@
 import mongoose from 'mongoose';
 
+import { AuditLogModel } from '@/models/AuditLog.model.js';
+import { BookmarkModel } from '@/models/Bookmark.model.js';
+import { CategoryModel } from '@/models/Category.model.js';
+import { CommentModel } from '@/models/Comment.model.js';
+import { GuideModel } from '@/models/Guide.model.js';
+import { RefreshTokenModel } from '@/models/RefreshToken.model.js';
+import { UserModel } from '@/models/User.model.js';
+
 import { env } from './env.js';
 import { logger } from './logger.js';
+
+async function ensureDatabaseIndexes() {
+  await Promise.all([
+    AuditLogModel.createIndexes(),
+    BookmarkModel.createIndexes(),
+    CategoryModel.createIndexes(),
+    CommentModel.createIndexes(),
+    GuideModel.createIndexes(),
+    RefreshTokenModel.createIndexes(),
+    UserModel.createIndexes(),
+  ]);
+
+  logger.info('MongoDB indexes ensured');
+}
 
 export async function connectDatabase() {
   mongoose.set('strictQuery', true);
@@ -15,6 +37,8 @@ export async function connectDatabase() {
     if (mongoose.connection.readyState !== 1) {
       throw new Error('MongoDB connection did not reach the connected state.');
     }
+
+    await ensureDatabaseIndexes();
 
     logger.info(
       {

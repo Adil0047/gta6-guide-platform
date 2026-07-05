@@ -1,4 +1,5 @@
 import { COMMENT_STATUSES } from '@gta6-guide/shared/community';
+import { isProduction } from '@/config/env.js';
 import { createSlug } from '@gta6-guide/shared/slug';
 
 import { connectDatabase, disconnectDatabase } from '@/config/database.js';
@@ -9,10 +10,20 @@ import { GuideModel } from '@/models/Guide.model.js';
 import { UserModel } from '@/models/User.model.js';
 import { hashPassword } from '@/utils/password.js';
 
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? 'admin@gta6guide.local';
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? 'AdminPass123!';
-const DEMO_USER_EMAIL = process.env.SEED_DEMO_USER_EMAIL ?? 'player@gta6guide.local';
-const DEMO_USER_PASSWORD = process.env.SEED_DEMO_USER_PASSWORD ?? 'PlayerPass123!';
+function getSeedValue(key: string, fallback: string) {
+  const value = process.env[key];
+
+  if (isProduction && !value) {
+    throw new Error(`${key} is required when running the seed script in production.`);
+  }
+
+  return value ?? fallback;
+}
+
+const ADMIN_EMAIL = getSeedValue('SEED_ADMIN_EMAIL', 'admin@gta6guide.local');
+const ADMIN_PASSWORD = getSeedValue('SEED_ADMIN_PASSWORD', 'AdminPass123!');
+const DEMO_USER_EMAIL = getSeedValue('SEED_DEMO_USER_EMAIL', 'player@gta6guide.local');
+const DEMO_USER_PASSWORD = getSeedValue('SEED_DEMO_USER_PASSWORD', 'PlayerPass123!');
 
 const categorySeeds = [
   {
@@ -376,8 +387,8 @@ async function seed() {
   }
 
   console.info('Seed complete.');
-  console.info(`Admin login: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
-  console.info(`Demo user login: ${DEMO_USER_EMAIL} / ${DEMO_USER_PASSWORD}`);
+  console.info(`Admin login email: ${ADMIN_EMAIL}`);
+  console.info(`Demo user login email: ${DEMO_USER_EMAIL}`);
 
   await disconnectDatabase();
 }

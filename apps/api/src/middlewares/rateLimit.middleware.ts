@@ -9,6 +9,7 @@ export const globalRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   statusCode: StatusCodes.TOO_MANY_REQUESTS,
+  skip: (request) => request.path.endsWith('/health'),
   message: {
     success: false,
     message: 'Too many requests, please try again later',
@@ -21,6 +22,7 @@ export const authRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   statusCode: StatusCodes.TOO_MANY_REQUESTS,
+  skipSuccessfulRequests: true,
   message: {
     success: false,
     message: 'Too many authentication attempts, please try again later',

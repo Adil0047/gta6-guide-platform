@@ -17,32 +17,67 @@ const mongoUriSchema = z
     'MONGODB_URI must start with mongodb:// or mongodb+srv://',
   );
 
-const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().positive().default(5000),
+const secretSchema = z
+  .string()
+  .trim()
+  .min(32, 'Secrets must be at least 32 characters long. Use 64+ random characters in production.');
 
-  CLIENT_URL: z.string().url(),
-  API_BASE_URL: z.string().default('/api/v1'),
+const envSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    PORT: z.coerce.number().int().positive().default(5000),
 
-  MONGODB_URI: mongoUriSchema,
+    CLIENT_URL: z.string().url(),
+    CLIENT_URLS: z.string().default(''),
+    API_BASE_URL: z.string().default('/api/v1'),
 
-  JWT_ACCESS_SECRET: z.string().min(32),
-  JWT_REFRESH_SECRET: z.string().min(32),
-  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+    MONGODB_URI: mongoUriSchema,
 
-  COOKIE_SECRET: z.string().min(32),
-  REFRESH_TOKEN_COOKIE_NAME: z.string().default('gta6_refresh_token'),
+    JWT_ACCESS_SECRET: secretSchema,
+    JWT_REFRESH_SECRET: secretSchema,
+    JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
+    JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 
-  BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
+    COOKIE_SECRET: secretSchema,
+    REFRESH_TOKEN_COOKIE_NAME: z.string().default('gta6_refresh_token'),
+    CSRF_COOKIE_NAME: z.string().default('gta6_csrf_token'),
 
-  RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000),
-  RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
-  AUTH_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000),
-  AUTH_RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(20),
+    BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
 
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
-});
+    RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000),
+    RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
+    AUTH_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000),
+    AUTH_RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(20),
+
+    LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  })
+  .superRefine((value, context) => {
+    if (value.JWT_ACCESS_SECRET === value.JWT_REFRESH_SECRET) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['JWT_REFRESH_SECRET'],
+        message: 'JWT_REFRESH_SECRET must be different from JWT_ACCESS_SECRET',
+      });
+    }
+
+    if (value.NODE_ENV === 'production') {
+      const productionSecrets = [
+        ['JWT_ACCESS_SECRET', value.JWT_ACCESS_SECRET],
+        ['JWT_REFRESH_SECRET', value.JWT_REFRESH_SECRET],
+        ['COOKIE_SECRET', value.COOKIE_SECRET],
+      ] as const;
+
+      productionSecrets.forEach(([key, secret]) => {
+        if (secret.length < 64 || secret.startsWith('replace-with')) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [key],
+            message: `${key} must be a unique 64+ character production secret`,
+          });
+        }
+      });
+    }
+  });
 
 const parsedEnv = envSchema.safeParse(process.env);
 

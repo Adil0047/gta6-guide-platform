@@ -1,10 +1,12 @@
-import { Menu, X } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { LogOut, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useCallback, useId, useState } from 'react';
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants/routes';
+import { authService } from '@/services';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
 import { cn } from '@/utils/cn';
@@ -20,6 +22,8 @@ const mobileLinks = [
 ];
 
 export function AdminMobileNav() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const menuId = useId();
   const shouldReduceMotion = useReducedMotion();
@@ -27,6 +31,13 @@ export function AdminMobileNav() {
   const close = useCallback(() => {
     setOpen(false);
   }, []);
+  const logoutMutation = useMutation({
+    mutationFn: authService.logout,
+    onSuccess: () => {
+      queryClient.clear();
+      navigate(ROUTES.login, { replace: true });
+    },
+  });
 
   useBodyScrollLock(open);
   useEscapeKey({ enabled: open, onEscape: close });
@@ -81,6 +92,19 @@ export function AdminMobileNav() {
                 {link.label}
               </NavLink>
             ))}
+            <Button
+              type="button"
+              variant="ghost"
+              className="justify-start"
+              disabled={logoutMutation.isPending}
+              onClick={() => {
+                close();
+                logoutMutation.mutate();
+              }}
+            >
+              <LogOut aria-hidden className="mr-2 size-4" />
+              Sign out
+            </Button>
           </motion.nav>
         ) : null}
       </AnimatePresence>

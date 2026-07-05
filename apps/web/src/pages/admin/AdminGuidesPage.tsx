@@ -99,13 +99,11 @@ export function AdminGuidesPage() {
   const saveGuideMutation = useMutation({
     mutationFn: () => {
       const tags = getTags(formState.tags);
-      const payload = {
+      const editablePayload = {
         title: formState.title,
         slug: formState.slug || undefined,
         excerpt: formState.excerpt,
         content: formState.content,
-        sections: [],
-        faqs: [],
         categoryId: effectiveCategoryId,
         tags,
         tagIds: tags.map((tag) => tag.toLowerCase().replaceAll(' ', '-')),
@@ -113,9 +111,19 @@ export function AdminGuidesPage() {
         difficulty: formState.difficulty,
         status: formState.status,
         visibility: formState.visibility,
-        coverImage: '',
         readTime: Number(formState.readTime),
         isFeatured: formState.isFeatured,
+      };
+
+      if (formState.id) {
+        return adminService.updateGuide(formState.id, editablePayload);
+      }
+
+      return adminService.createGuide({
+        ...editablePayload,
+        sections: [],
+        faqs: [],
+        coverImage: '',
         seo: {
           metaTitle: formState.title,
           metaDescription: formState.excerpt,
@@ -132,9 +140,7 @@ export function AdminGuidesPage() {
           platform: '',
           gameVersion: '',
         },
-      };
-
-      return formState.id ? adminService.updateGuide(formState.id, payload) : adminService.createGuide(payload);
+      });
     },
     onSuccess: () => {
       setFormState(defaultGuideForm);

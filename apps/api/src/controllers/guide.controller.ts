@@ -10,6 +10,7 @@ import {
   listGuides,
   updateGuide,
 } from '@/services/guide.service.js';
+import { createAuditLog } from '@/services/audit.service.js';
 import { asyncHandler } from '@/utils/asyncHandler.js';
 import { sendResponse } from '@/utils/apiResponse.js';
 import { getRouteParam } from '@/utils/routeParams.js';
@@ -58,6 +59,16 @@ export const getGuideBySlugController = asyncHandler(async (request, response) =
 export const createGuideController = asyncHandler(async (request, response) => {
   const guide = await createGuide(request.body, request.user!.id);
 
+  await createAuditLog({
+    actorId: request.user!.id,
+    action: 'guide.create',
+    resourceType: 'guide',
+    resourceId: String(guide._id),
+    metadata: { slug: guide.slug, status: guide.status },
+    ip: request.ip,
+    userAgent: request.get('user-agent') ?? '',
+  });
+
   sendResponse({
     response,
     statusCode: StatusCodes.CREATED,
@@ -69,6 +80,16 @@ export const createGuideController = asyncHandler(async (request, response) => {
 export const updateGuideController = asyncHandler(async (request, response) => {
   const guide = await updateGuide(getRouteParam(request.params, 'id'), request.body);
 
+  await createAuditLog({
+    actorId: request.user!.id,
+    action: 'guide.update',
+    resourceType: 'guide',
+    resourceId: String(guide._id),
+    metadata: { updatedFields: Object.keys(request.body as Record<string, unknown>) },
+    ip: request.ip,
+    userAgent: request.get('user-agent') ?? '',
+  });
+
   sendResponse({
     response,
     statusCode: StatusCodes.OK,
@@ -79,6 +100,16 @@ export const updateGuideController = asyncHandler(async (request, response) => {
 
 export const deleteGuideController = asyncHandler(async (request, response) => {
   const guide = await deleteGuide(getRouteParam(request.params, 'id'));
+
+  await createAuditLog({
+    actorId: request.user!.id,
+    action: 'guide.delete',
+    resourceType: 'guide',
+    resourceId: String(guide._id),
+    metadata: { slug: guide.slug },
+    ip: request.ip,
+    userAgent: request.get('user-agent') ?? '',
+  });
 
   sendResponse({
     response,

@@ -68,3 +68,14 @@ Format files:
 Build all apps:
 
     pnpm build
+
+## Production documentation
+
+- [API documentation](docs/API.md)
+- [Local setup guide](docs/LOCAL_SETUP.md)
+- [Deployment guide](docs/DEPLOYMENT.md)
+- [Environment variable guide](docs/ENVIRONMENT.md)
+- [Database schema documentation](docs/DATABASE_SCHEMA.md)
+- [Project architecture documentation](docs/ARCHITECTURE.md)
+- [Security review](docs/SECURITY.md)
+

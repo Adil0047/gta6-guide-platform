@@ -8,7 +8,7 @@ import {
   listCategoriesController,
   updateCategoryController,
 } from '@/controllers/category.controller.js';
-import { requireAuth, requireRoles } from '@/middlewares/auth.middleware.js';
+import { optionalAuth, requireAuth, requireRoles } from '@/middlewares/auth.middleware.js';
 import { validate } from '@/middlewares/validate.middleware.js';
 import { USER_ROLES } from '@gta6-guide/shared/roles';
 import {
@@ -21,9 +21,9 @@ import {
 
 export const categoryRouter = Router();
 
-categoryRouter.get('/', validate(listCategoriesSchema), listCategoriesController);
-categoryRouter.get('/slug/:slug', validate(getCategoryBySlugSchema), getCategoryBySlugController);
-categoryRouter.get('/:id', validate(getCategoryByIdSchema), getCategoryByIdController);
+categoryRouter.get('/', optionalAuth, validate(listCategoriesSchema), listCategoriesController);
+categoryRouter.get('/slug/:slug', optionalAuth, validate(getCategoryBySlugSchema), getCategoryBySlugController);
+categoryRouter.get('/:id', optionalAuth, validate(getCategoryByIdSchema), getCategoryByIdController);
 
 categoryRouter.post(
   '/',

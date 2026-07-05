@@ -32,8 +32,10 @@ function serializeBookmark(bookmark: PopulatedBookmarkRecord): BookmarkDto {
   };
 }
 
-async function ensurePublishedGuide(guideId: string) {
-  const guide = await GuideModel.findOne({ _id: guideId, status: 'published' }).select('_id').lean();
+async function ensurePublicGuide(guideId: string) {
+  const guide = await GuideModel.findOne({ _id: guideId, status: 'published', visibility: 'public' })
+    .select('_id')
+    .lean();
 
   if (!guide) {
     throw new AppError('Guide not found', StatusCodes.NOT_FOUND);
@@ -42,9 +44,13 @@ async function ensurePublishedGuide(guideId: string) {
 
 export async function listBookmarks(userId: string, query: unknown) {
   const { page, limit, skip } = getPagination(query);
+  const publicGuideIds = await GuideModel.find({ status: 'published', visibility: 'public' })
+    .select('_id')
+    .lean();
+  const filter = { userId, guideId: { $in: publicGuideIds.map((guide) => guide._id) } };
 
   const [items, total] = await Promise.all([
-    BookmarkModel.find({ userId })
+    BookmarkModel.find(filter)
       .populate({
         path: 'guideId',
         populate: [
@@ -56,7 +62,7 @@ export async function listBookmarks(userId: string, query: unknown) {
       .skip(skip)
       .limit(limit)
       .lean(),
-    BookmarkModel.countDocuments({ userId }),
+    BookmarkModel.countDocuments(filter),
   ]);
 
   return {
@@ -66,9 +72,23 @@ export async function listBookmarks(userId: string, query: unknown) {
 }
 
 export async function getBookmarkStatus(userId: string, guideId: string) {
-  const bookmark = isValidObjectId(guideId)
-    ? await BookmarkModel.findOne({ userId, guideId }).select('_id').lean()
-    : null;
+  if (!isValidObjectId(guideId)) {
+    return {
+      isBookmarked: false,
+    };
+  }
+
+  const publicGuide = await GuideModel.findOne({ _id: guideId, status: 'published', visibility: 'public' })
+    .select('_id')
+    .lean();
+
+  if (!publicGuide) {
+    return {
+      isBookmarked: false,
+    };
+  }
+
+  const bookmark = await BookmarkModel.findOne({ userId, guideId }).select('_id').lean();
 
   return {
     isBookmarked: Boolean(bookmark),
@@ -76,7 +96,7 @@ export async function getBookmarkStatus(userId: string, guideId: string) {
 }
 
 export async function createBookmark(userId: string, input: CreateBookmarkInput) {
-  await ensurePublishedGuide(input.guideId);
+  await ensurePublicGuide(input.guideId);
 
   const existingBookmark = await BookmarkModel.findOne({ userId, guideId: input.guideId }).lean();
 

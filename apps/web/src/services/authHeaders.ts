@@ -1,7 +1,10 @@
-import { getAuthSession } from '@/features/auth/authSession';
+import { getAccessToken } from '@/features/auth/authSession';
 
 export function getAuthOptions() {
-  const session = getAuthSession();
+  const accessToken = getAccessToken();
 
-  return session?.accessToken ? { authToken: session.accessToken } : undefined;
+  return {
+    authToken: accessToken ?? undefined,
+    requiresAuth: true,
+  };
 }

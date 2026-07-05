@@ -1,3 +1,4 @@
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router';
 
 import { AdminLayout } from '@/app/layouts/AdminLayout';
@@ -5,30 +6,69 @@ import { AuthLayout } from '@/app/layouts/AuthLayout';
 import { PublicLayout } from '@/app/layouts/PublicLayout';
 import { UserLayout } from '@/app/layouts/UserLayout';
 import { ROUTES } from '@/constants/routes';
-import { AdminAnalyticsPage } from '@/pages/admin/AdminAnalyticsPage';
-import { AdminCategoriesPage } from '@/pages/admin/AdminCategoriesPage';
-import { AdminCommentsPage } from '@/pages/admin/AdminCommentsPage';
-import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
-import { AdminGuidesPage } from '@/pages/admin/AdminGuidesPage';
-import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage';
-import { AdminUsersPage } from '@/pages/admin/AdminUsersPage';
-import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
-import { LoginPage } from '@/pages/auth/LoginPage';
-import { RegisterPage } from '@/pages/auth/RegisterPage';
-import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage';
 import { ADMIN_ROLES, AUTHENTICATED_ROLES, ProtectedRoute } from '@/features/auth';
 import { NotFoundPage } from '@/pages/errors/NotFoundPage';
-import { CategoriesPage } from '@/pages/public/CategoriesPage';
-import { CategoryDetailPage } from '@/pages/public/CategoryDetailPage';
-import { GuideDetailPage } from '@/pages/public/GuideDetailPage';
-import { GuidesPage } from '@/pages/public/GuidesPage';
-import { HomePage } from '@/pages/public/HomePage';
-import { MapPage } from '@/pages/public/MapPage';
-import { SearchPage } from '@/pages/public/SearchPage';
-import { UserBookmarksPage } from '@/pages/user/UserBookmarksPage';
-import { UserCommentsPage } from '@/pages/user/UserCommentsPage';
-import { UserDashboardPage } from '@/pages/user/UserDashboardPage';
-import { UserSettingsPage } from '@/pages/user/UserSettingsPage';
+
+const AdminAnalyticsPage = lazy(() =>
+  import('@/pages/admin/AdminAnalyticsPage').then((module) => ({ default: module.AdminAnalyticsPage })),
+);
+const AdminCategoriesPage = lazy(() =>
+  import('@/pages/admin/AdminCategoriesPage').then((module) => ({ default: module.AdminCategoriesPage })),
+);
+const AdminCommentsPage = lazy(() =>
+  import('@/pages/admin/AdminCommentsPage').then((module) => ({ default: module.AdminCommentsPage })),
+);
+const AdminDashboardPage = lazy(() =>
+  import('@/pages/admin/AdminDashboardPage').then((module) => ({ default: module.AdminDashboardPage })),
+);
+const AdminGuidesPage = lazy(() =>
+  import('@/pages/admin/AdminGuidesPage').then((module) => ({ default: module.AdminGuidesPage })),
+);
+const AdminSettingsPage = lazy(() =>
+  import('@/pages/admin/AdminSettingsPage').then((module) => ({ default: module.AdminSettingsPage })),
+);
+const AdminUsersPage = lazy(() =>
+  import('@/pages/admin/AdminUsersPage').then((module) => ({ default: module.AdminUsersPage })),
+);
+const CategoriesPage = lazy(() =>
+  import('@/pages/public/CategoriesPage').then((module) => ({ default: module.CategoriesPage })),
+);
+const CategoryDetailPage = lazy(() =>
+  import('@/pages/public/CategoryDetailPage').then((module) => ({ default: module.CategoryDetailPage })),
+);
+const GuideDetailPage = lazy(() =>
+  import('@/pages/public/GuideDetailPage').then((module) => ({ default: module.GuideDetailPage })),
+);
+const GuidesPage = lazy(() =>
+  import('@/pages/public/GuidesPage').then((module) => ({ default: module.GuidesPage })),
+);
+const HomePage = lazy(() =>
+  import('@/pages/public/HomePage').then((module) => ({ default: module.HomePage })),
+);
+const LoginPage = lazy(() =>
+  import('@/pages/auth/LoginPage').then((module) => ({ default: module.LoginPage })),
+);
+const RegisterPage = lazy(() =>
+  import('@/pages/auth/RegisterPage').then((module) => ({ default: module.RegisterPage })),
+);
+const MapPage = lazy(() =>
+  import('@/pages/public/MapPage').then((module) => ({ default: module.MapPage })),
+);
+const SearchPage = lazy(() =>
+  import('@/pages/public/SearchPage').then((module) => ({ default: module.SearchPage })),
+);
+const UserBookmarksPage = lazy(() =>
+  import('@/pages/user/UserBookmarksPage').then((module) => ({ default: module.UserBookmarksPage })),
+);
+const UserCommentsPage = lazy(() =>
+  import('@/pages/user/UserCommentsPage').then((module) => ({ default: module.UserCommentsPage })),
+);
+const UserDashboardPage = lazy(() =>
+  import('@/pages/user/UserDashboardPage').then((module) => ({ default: module.UserDashboardPage })),
+);
+const UserSettingsPage = lazy(() =>
+  import('@/pages/user/UserSettingsPage').then((module) => ({ default: module.UserSettingsPage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -77,14 +117,6 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.register,
         element: <RegisterPage />,
-      },
-      {
-        path: ROUTES.forgotPassword,
-        element: <ForgotPasswordPage />,
-      },
-      {
-        path: ROUTES.resetPassword,
-        element: <ResetPasswordPage />,
       },
     ],
   },

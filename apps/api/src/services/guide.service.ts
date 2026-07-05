@@ -4,21 +4,26 @@ import { createSlug } from '@gta6-guide/shared/slug';
 import { StatusCodes } from 'http-status-codes';
 import { type SortOrder } from 'mongoose';
 
+import { BookmarkModel } from '@/models/Bookmark.model.js';
 import { CategoryModel } from '@/models/Category.model.js';
+import { CommentModel } from '@/models/Comment.model.js';
 import { GuideModel } from '@/models/Guide.model.js';
 import { AppError } from '@/utils/appError.js';
 type CreateGuideInput = CreateGuideDto;
 
 type UpdateGuideInput = UpdateGuideDto;
 
+function createPublicGuideAccessFilter() {
+  return {
+    status: 'published',
+    visibility: 'public',
+  };
+}
+
 function createGuideFilter(query: Record<string, unknown>, includeDrafts = false) {
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = includeDrafts ? {} : createPublicGuideAccessFilter();
 
-  if (!includeDrafts) {
-    filter.status = 'published';
-  }
-
-  if (typeof query.status === 'string') {
+  if (includeDrafts && typeof query.status === 'string') {
     filter.status = query.status;
   }
 
@@ -67,8 +72,27 @@ export async function listGuides(query: unknown, includeDrafts = false) {
 
   const filter = createGuideFilter(parsedQuery, includeDrafts);
 
+  if (!includeDrafts && typeof parsedQuery.categoryId === 'string') {
+    const category = await CategoryModel.findOne({ _id: parsedQuery.categoryId, isActive: true })
+      .select('_id')
+      .lean();
+
+    if (!category) {
+      return {
+        items: [],
+        meta: createPaginationMeta(0, page, limit),
+      };
+    }
+  }
+
   if (typeof parsedQuery.categorySlug === 'string') {
-    const category = await CategoryModel.findOne({ slug: parsedQuery.categorySlug })
+    const categoryFilter: Record<string, unknown> = { slug: parsedQuery.categorySlug };
+
+    if (!includeDrafts) {
+      categoryFilter.isActive = true;
+    }
+
+    const category = await CategoryModel.findOne(categoryFilter)
       .select('_id')
       .lean();
 
@@ -103,7 +127,7 @@ export async function getGuideById(id: string, includeDrafts = false) {
   const filter: Record<string, unknown> = { _id: id };
 
   if (!includeDrafts) {
-    filter.status = 'published';
+    Object.assign(filter, createPublicGuideAccessFilter());
   }
 
   const guide = await GuideModel.findOne(filter)
@@ -122,7 +146,7 @@ export async function getGuideBySlug(slug: string, includeDrafts = false) {
   const filter: Record<string, unknown> = { slug };
 
   if (!includeDrafts) {
-    filter.status = 'published';
+    Object.assign(filter, createPublicGuideAccessFilter());
   }
 
   const guide = await GuideModel.findOne(filter)
@@ -194,12 +218,17 @@ export async function deleteGuide(id: string) {
     throw new AppError('Guide not found', StatusCodes.NOT_FOUND);
   }
 
+  await Promise.all([
+    BookmarkModel.deleteMany({ guideId: guide._id }),
+    CommentModel.deleteMany({ guideId: guide._id }),
+  ]);
+
   return guide;
 }
 
 export async function incrementGuideView(slug: string) {
   await GuideModel.findOneAndUpdate(
-    { slug, status: 'published' },
+    { slug, ...createPublicGuideAccessFilter() },
     {
       $inc: {
         'metrics.viewCount': 1,

@@ -1,6 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { env } from '@/config/env.js';
 import {
   changePassword,
   getRefreshTokenFromSignedCookies,
@@ -9,8 +8,14 @@ import {
   refreshAuth,
   registerUser,
 } from '@/services/auth.service.js';
+import { createAuditLog } from '@/services/audit.service.js';
 import { asyncHandler } from '@/utils/asyncHandler.js';
-import { clearRefreshTokenCookie, setRefreshTokenCookie } from '@/utils/cookies.js';
+import {
+  clearCsrfCookie,
+  clearRefreshTokenCookie,
+  setCsrfCookie,
+  setRefreshTokenCookie,
+} from '@/utils/cookies.js';
 import { sendResponse } from '@/utils/apiResponse.js';
 
 export const register = asyncHandler(async (request, response) => {
@@ -32,6 +37,16 @@ export const login = asyncHandler(async (request, response) => {
   });
 
   setRefreshTokenCookie(response, result.refreshToken);
+  setCsrfCookie(response);
+
+  await createAuditLog({
+    actorId: result.user.id,
+    action: 'auth.login',
+    resourceType: 'user',
+    resourceId: result.user.id,
+    ip: request.ip,
+    userAgent: request.get('user-agent') ?? '',
+  });
 
   sendResponse({
     response,
@@ -58,6 +73,7 @@ export const refresh = asyncHandler(async (request, response) => {
   const result = await refreshAuth(refreshToken);
 
   setRefreshTokenCookie(response, result.refreshToken);
+  setCsrfCookie(response);
 
   sendResponse({
     response,
@@ -75,7 +91,19 @@ export const logout = asyncHandler(async (request, response) => {
 
   await logoutUser(refreshToken, request.ip);
 
+  if (request.user) {
+    await createAuditLog({
+      actorId: request.user.id,
+      action: 'auth.logout',
+      resourceType: 'user',
+      resourceId: request.user.id,
+      ip: request.ip,
+      userAgent: request.get('user-agent') ?? '',
+    });
+  }
+
   clearRefreshTokenCookie(response);
+  clearCsrfCookie(response);
 
   sendResponse({
     response,
@@ -91,8 +119,17 @@ export const changePasswordController = asyncHandler(async (request, response) =
     request.body.newPassword,
   );
 
+  await createAuditLog({
+    actorId: request.user!.id,
+    action: 'auth.password.change',
+    resourceType: 'user',
+    resourceId: request.user!.id,
+    ip: request.ip,
+    userAgent: request.get('user-agent') ?? '',
+  });
+
   clearRefreshTokenCookie(response);
-  response.clearCookie(env.REFRESH_TOKEN_COOKIE_NAME);
+  clearCsrfCookie(response);
 
   sendResponse({
     response,

@@ -1,3 +1,7 @@
+declare const process:
+  | { env: Record<string, string | undefined> }
+  | undefined;
+
 type AppEnv = {
   appName: string;
   appEnv: 'development' | 'staging' | 'production';
@@ -5,8 +9,22 @@ type AppEnv = {
   siteUrl: string;
 };
 
+type EnvSource = Partial<Record<keyof ImportMetaEnv, string | undefined>>;
+
+function getEnvSource(): EnvSource {
+  if (typeof import.meta.env !== 'undefined') {
+    return import.meta.env;
+  }
+
+  if (typeof process !== 'undefined') {
+    return process.env as EnvSource;
+  }
+
+  return {};
+}
+
 function getRequiredEnvValue(key: keyof ImportMetaEnv) {
-  const value = import.meta.env[key];
+  const value = getEnvSource()[key];
 
   if (!value) {
     throw new Error(`Missing required environment variable: ${key}`);

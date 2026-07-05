@@ -5,6 +5,7 @@ export const SITE_CONFIG = {
   description:
     'A premium GTA VI guide platform for missions, characters, vehicles, locations, secrets, tips, and interactive map discovery.',
   url: env.siteUrl,
+  defaultImage: `${env.siteUrl}/og-image.png`,
   creator: 'GTA VI Guide Platform',
   keywords: [
     'GTA VI guide',

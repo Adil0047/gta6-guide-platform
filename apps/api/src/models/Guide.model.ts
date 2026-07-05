@@ -245,6 +245,9 @@ guideSchema.index({
 guideSchema.index({ status: 1, publishedAt: -1 });
 guideSchema.index({ categoryId: 1, status: 1, publishedAt: -1 });
 guideSchema.index({ isFeatured: 1, status: 1, publishedAt: -1 });
+guideSchema.index({ status: 1, type: 1, publishedAt: -1 });
+guideSchema.index({ status: 1, difficulty: 1, publishedAt: -1 });
+guideSchema.index({ status: 1, 'metrics.viewCount': -1, publishedAt: -1 });
 
 export type Guide = InferSchemaType<typeof guideSchema>;
 export type GuideDocument = HydratedDocument<Guide>;

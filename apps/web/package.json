@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -b --noEmit",
-    "predev": "pnpm --filter @gta6-guide/shared build"
+    "predev": "pnpm --filter @gta6-guide/shared build",
+    "test": "tsx --tsconfig tsconfig.app.json --test tests/*.test.tsx",
+    "prebuild": "node scripts/generate-seo-files.mjs"
   },
   "dependencies": {
     "@gta6-guide/shared": "workspace:*",
@@ -31,6 +33,7 @@
     "@types/react-dom": "19.1.6",
     "@vitejs/plugin-react": "4.6.0",
     "typescript": "5.8.3",
-    "vite": "6.3.5"
+    "vite": "6.3.5",
+    "tsx": "4.20.3"
   }
 }

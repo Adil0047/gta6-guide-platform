@@ -60,6 +60,7 @@ const categorySchema = new Schema(
 );
 
 categorySchema.index({ slug: 1, isActive: 1 });
+categorySchema.index({ isActive: 1, order: 1, title: 1 });
 categorySchema.index({ title: 'text', description: 'text' });
 
 export type Category = InferSchemaType<typeof categorySchema>;

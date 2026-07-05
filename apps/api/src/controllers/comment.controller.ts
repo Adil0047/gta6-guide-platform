@@ -9,6 +9,7 @@ import {
   updateComment,
   updateCommentStatus,
 } from '@/services/comment.service.js';
+import { createAuditLog } from '@/services/audit.service.js';
 import { sendResponse } from '@/utils/apiResponse.js';
 import { asyncHandler } from '@/utils/asyncHandler.js';
 import { getRouteParam } from '@/utils/routeParams.js';
@@ -72,7 +73,18 @@ export const updateCommentController = asyncHandler(async (request, response) =>
 });
 
 export const updateCommentStatusController = asyncHandler(async (request, response) => {
-  const comment = await updateCommentStatus(getRouteParam(request.params, 'id'), request.body.status);
+  const commentId = getRouteParam(request.params, 'id');
+  const comment = await updateCommentStatus(commentId, request.body.status);
+
+  await createAuditLog({
+    actorId: request.user!.id,
+    action: 'comment.status.update',
+    resourceType: 'comment',
+    resourceId: commentId,
+    metadata: { status: request.body.status },
+    ip: request.ip,
+    userAgent: request.get('user-agent') ?? '',
+  });
 
   sendResponse({
     response,
@@ -83,7 +95,20 @@ export const updateCommentStatusController = asyncHandler(async (request, respon
 });
 
 export const deleteCommentController = asyncHandler(async (request, response) => {
-  const comment = await deleteComment(getRouteParam(request.params, 'id'), request.user!);
+  const commentId = getRouteParam(request.params, 'id');
+  const comment = await deleteComment(commentId, request.user!);
+
+  if (request.user!.role === 'admin' || request.user!.role === 'superAdmin') {
+    await createAuditLog({
+      actorId: request.user!.id,
+      action: 'comment.delete',
+      resourceType: 'comment',
+      resourceId: commentId,
+      metadata: { guideId: comment.guideId },
+      ip: request.ip,
+      userAgent: request.get('user-agent') ?? '',
+    });
+  }
 
   sendResponse({
     response,

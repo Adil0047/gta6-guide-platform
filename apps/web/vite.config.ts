@@ -10,4 +10,17 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router'],
+          query: ['@tanstack/react-query'],
+          icons: ['lucide-react'],
+          motion: ['motion'],
+        },
+      },
+    },
+  },
 });

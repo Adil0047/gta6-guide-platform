@@ -35,9 +35,18 @@ app.use(
 
 app.use(
   helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: {
       policy: isProduction ? 'same-site' : 'cross-origin',
     },
+    hsts: isProduction
+      ? {
+          maxAge: 31_536_000,
+          includeSubDomains: true,
+          preload: true,
+        }
+      : false,
   }),
 );
 

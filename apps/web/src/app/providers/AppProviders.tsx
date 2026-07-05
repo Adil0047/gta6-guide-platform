@@ -11,8 +11,13 @@ export function AppProviders() {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60_000,
+            gcTime: 10 * 60_000,
+            refetchOnWindowFocus: false,
             retry: 1,
+            staleTime: 5 * 60_000,
+          },
+          mutations: {
+            retry: false,
           },
         },
       }),

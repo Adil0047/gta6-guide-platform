@@ -11,7 +11,7 @@ type CreateCategoryInput = CreateCategoryDto;
 type UpdateCategoryInput = UpdateCategoryDto;
 
 
-async function addGuideCounts<TCategory extends { _id?: unknown }>(categories: TCategory[]) {
+async function addGuideCounts<TCategory extends { _id?: unknown }>(categories: TCategory[], includeInactive = false) {
   const categoryIds = categories.map((category) => category._id).filter(Boolean);
 
   if (categoryIds.length === 0) {
@@ -22,7 +22,7 @@ async function addGuideCounts<TCategory extends { _id?: unknown }>(categories: T
     {
       $match: {
         categoryId: { $in: categoryIds },
-        status: 'published',
+        ...(includeInactive ? {} : { status: 'published', visibility: 'public' }),
       },
     },
     {
@@ -41,12 +41,12 @@ async function addGuideCounts<TCategory extends { _id?: unknown }>(categories: T
   }));
 }
 
-async function addGuideCount<TCategory extends { _id?: unknown }>(category: TCategory) {
-  const [categoryWithCount] = await addGuideCounts([category]);
+async function addGuideCount<TCategory extends { _id?: unknown }>(category: TCategory, includeInactive = false) {
+  const [categoryWithCount] = await addGuideCounts([category], includeInactive);
 
   return categoryWithCount;
 }
-export async function listCategories(query: unknown) {
+export async function listCategories(query: unknown, includeInactive = false) {
   const { page, limit, skip } = getPagination(query);
   const parsedQuery = query as {
     isActive?: string;
@@ -55,11 +55,11 @@ export async function listCategories(query: unknown) {
 
   const filter: Record<string, unknown> = {};
 
-  if (parsedQuery.isActive === 'true') {
+  if (!includeInactive) {
     filter.isActive = true;
-  }
-
-  if (parsedQuery.isActive === 'false') {
+  } else if (parsedQuery.isActive === 'true') {
+    filter.isActive = true;
+  } else if (parsedQuery.isActive === 'false') {
     filter.isActive = false;
   }
 
@@ -73,29 +73,41 @@ export async function listCategories(query: unknown) {
   ]);
 
   return {
-    items: await addGuideCounts(items),
+    items: await addGuideCounts(items, includeInactive),
     meta: createPaginationMeta(total, page, limit),
   };
 }
 
-export async function getCategoryById(id: string) {
-  const category = await CategoryModel.findById(id).lean();
+export async function getCategoryById(id: string, includeInactive = false) {
+  const filter: Record<string, unknown> = { _id: id };
+
+  if (!includeInactive) {
+    filter.isActive = true;
+  }
+
+  const category = await CategoryModel.findOne(filter).lean();
 
   if (!category) {
     throw new AppError('Category not found', StatusCodes.NOT_FOUND);
   }
 
-  return addGuideCount(category);
+  return addGuideCount(category, includeInactive);
 }
 
-export async function getCategoryBySlug(slug: string) {
-  const category = await CategoryModel.findOne({ slug }).lean();
+export async function getCategoryBySlug(slug: string, includeInactive = false) {
+  const filter: Record<string, unknown> = { slug };
+
+  if (!includeInactive) {
+    filter.isActive = true;
+  }
+
+  const category = await CategoryModel.findOne(filter).lean();
 
   if (!category) {
     throw new AppError('Category not found', StatusCodes.NOT_FOUND);
   }
 
-  return addGuideCount(category);
+  return addGuideCount(category, includeInactive);
 }
 
 export async function createCategory(input: CreateCategoryInput) {
@@ -134,11 +146,17 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
 }
 
 export async function deleteCategory(id: string) {
+  const guideCount = await GuideModel.countDocuments({ categoryId: id });
+
+  if (guideCount > 0) {
+    throw new AppError('Cannot delete a category that has guides', StatusCodes.CONFLICT);
+  }
+
   const category = await CategoryModel.findByIdAndDelete(id);
 
   if (!category) {
     throw new AppError('Category not found', StatusCodes.NOT_FOUND);
   }
 
-  return addGuideCount(category.toObject());
+  return addGuideCount(category.toObject(), true);
 }

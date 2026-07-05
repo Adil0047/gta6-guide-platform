@@ -1,7 +1,10 @@
-import { Bookmark, Home, MessageCircle, Settings, UserRound } from 'lucide-react';
-import { NavLink } from 'react-router';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Bookmark, Home, LogOut, MessageCircle, Settings, UserRound } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router';
 
+import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants/routes';
+import { authService } from '@/services';
 import { cn } from '@/utils/cn';
 
 const userDashboardLinks = [
@@ -28,6 +31,16 @@ const userDashboardLinks = [
 ];
 
 export function DashboardNav() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const logoutMutation = useMutation({
+    mutationFn: authService.logout,
+    onSuccess: () => {
+      queryClient.clear();
+      navigate(ROUTES.login, { replace: true });
+    },
+  });
+
   return (
     <aside className="rounded-panel border border-white/10 bg-white/[0.04] p-4 shadow-panel backdrop-blur-xl">
       <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
@@ -69,6 +82,18 @@ export function DashboardNav() {
           );
         })}
       </nav>
+      <Button
+        type="button"
+        variant="ghost"
+        className="mt-4 w-full justify-start"
+        disabled={logoutMutation.isPending}
+        onClick={() => {
+          logoutMutation.mutate();
+        }}
+      >
+        <LogOut aria-hidden className="mr-2 size-4" />
+        Sign out
+      </Button>
     </aside>
   );
 }

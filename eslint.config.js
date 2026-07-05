@@ -40,6 +40,16 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }]
     }
   },
+
+  {
+    files: ['apps/*/tests/**/*.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.es2022
+      }
+    }
+  },
   {
     files: ['apps/api/**/*.ts'],
     languageOptions: {

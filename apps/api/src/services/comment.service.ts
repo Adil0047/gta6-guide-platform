@@ -63,8 +63,10 @@ function populateCommentQuery<TQuery extends PopulatableQuery<TQuery>>(query: TQ
     .populate('parentId', 'body status userId createdAt');
 }
 
-async function ensurePublishedGuide(guideId: string) {
-  const guide = await GuideModel.findOne({ _id: guideId, status: 'published' }).select('_id').lean();
+async function ensurePublicGuide(guideId: string) {
+  const guide = await GuideModel.findOne({ _id: guideId, status: 'published', visibility: 'public' })
+    .select('_id')
+    .lean();
 
   if (!guide) {
     throw new AppError('Guide not found', StatusCodes.NOT_FOUND);
@@ -72,6 +74,8 @@ async function ensurePublishedGuide(guideId: string) {
 }
 
 export async function listGuideComments(guideId: string, query: unknown) {
+  await ensurePublicGuide(guideId);
+
   const { page, limit, skip } = getPagination(query);
   const filter = {
     guideId,
@@ -141,7 +145,7 @@ export async function listComments(query: unknown) {
 }
 
 export async function createComment(userId: string, input: CreateCommentInput) {
-  await ensurePublishedGuide(input.guideId);
+  await ensurePublicGuide(input.guideId);
 
   const comment = await CommentModel.create({
     userId,

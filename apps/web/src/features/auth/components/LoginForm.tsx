@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants/routes';
@@ -65,12 +65,7 @@ export function LoginForm() {
           Remember me
         </label>
 
-        <Link
-          to={ROUTES.forgotPassword}
-          className="text-sm font-semibold text-neon-cyan transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        >
-          Forgot password?
-        </Link>
+        <span className="text-sm text-text-muted">Password reset is handled by an administrator.</span>
       </div>
 
       <Button type="submit" className="w-full" disabled={loginMutation.isPending}>

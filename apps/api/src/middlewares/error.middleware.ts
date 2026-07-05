@@ -39,8 +39,13 @@ export const errorMiddleware: ErrorRequestHandler = (error, request, response, _
     statusCode = StatusCodes.CONFLICT;
     message = 'Duplicate resource';
     details = 'keyValue' in error ? error.keyValue : undefined;
-  } else if (error instanceof Error) {
+  } else if (error instanceof Error && !isProduction) {
     message = error.message || message;
+  }
+
+  if (isProduction && statusCode >= StatusCodes.INTERNAL_SERVER_ERROR) {
+    message = 'Internal server error';
+    details = undefined;
   }
 
   logger.error(

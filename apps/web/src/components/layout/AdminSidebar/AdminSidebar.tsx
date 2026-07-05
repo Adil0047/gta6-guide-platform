@@ -1,16 +1,20 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   BarChart3,
   BookOpen,
   FolderTree,
   Home,
+  LogOut,
   MessageCircle,
   Settings,
   ShieldCheck,
   UsersRound,
 } from 'lucide-react';
-import { Link, NavLink } from 'react-router';
+import { Link, NavLink, useNavigate } from 'react-router';
 
+import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants/routes';
+import { authService } from '@/services';
 import { cn } from '@/utils/cn';
 
 const adminLinks = [
@@ -52,6 +56,16 @@ const adminLinks = [
 ];
 
 export function AdminSidebar() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const logoutMutation = useMutation({
+    mutationFn: authService.logout,
+    onSuccess: () => {
+      queryClient.clear();
+      navigate(ROUTES.login, { replace: true });
+    },
+  });
+
   return (
     <aside className="sticky top-0 hidden h-screen border-r border-white/10 bg-background/95 p-4 backdrop-blur-xl lg:block">
       <Link
@@ -96,6 +110,18 @@ export function AdminSidebar() {
           );
         })}
       </nav>
+      <Button
+        type="button"
+        variant="ghost"
+        className="mt-6 w-full justify-start"
+        disabled={logoutMutation.isPending}
+        onClick={() => {
+          logoutMutation.mutate();
+        }}
+      >
+        <LogOut aria-hidden className="mr-2 size-4" />
+        Sign out
+      </Button>
     </aside>
   );
 }

@@ -1,3 +1,4 @@
+import { CategoryModel } from '@/models/Category.model.js';
 import { GuideModel } from '@/models/Guide.model.js';
 import { createPaginationMeta, getPagination } from '@gta6-guide/shared/pagination';
 
@@ -15,10 +16,22 @@ export async function searchGuides(query: unknown) {
 
   const filter: Record<string, unknown> = {
     status: 'published',
+    visibility: 'public',
     $text: { $search: searchTerm },
   };
 
   if (typeof parsedQuery.categoryId === 'string') {
+    const category = await CategoryModel.findOne({ _id: parsedQuery.categoryId, isActive: true })
+      .select('_id')
+      .lean();
+
+    if (!category) {
+      return {
+        items: [],
+        meta: createPaginationMeta(0, page, limit),
+      };
+    }
+
     filter.categoryId = parsedQuery.categoryId;
   }
 
