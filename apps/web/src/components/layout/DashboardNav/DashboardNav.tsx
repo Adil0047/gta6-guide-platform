@@ -74,8 +74,11 @@ export function DashboardNav() {
             >
               {({ isActive }) => (
                 <>
-                  <Icon aria-hidden className={cn('size-5', isActive ? 'text-black' : 'text-neon-cyan')} />
-                  {link.label}
+                  <Icon
+                    aria-hidden
+                    className={cn('size-5', isActive ? 'text-black' : 'text-neon-cyan')}
+                  />
+                  <span className={isActive ? 'text-black' : ''}>{link.label}</span>
                 </>
               )}
             </NavLink>

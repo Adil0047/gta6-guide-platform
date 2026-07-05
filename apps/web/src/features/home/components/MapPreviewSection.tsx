@@ -22,13 +22,22 @@ export function MapPreviewSection() {
               markers, saved routes, and premium interactive discovery tools.
             </p>
 
-            <Link
+            {/* <Link
               to={ROUTES.map}
               className="mt-8 inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Open map
               <ArrowRight aria-hidden className="ml-2 size-4" />
+            </Link> */}
+
+            <Link
+              to={ROUTES.map}
+              className="mt-8 inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <span className="text-black">Open map</span>
+              <ArrowRight aria-hidden className="ml-2 size-4 text-black" />
             </Link>
+            
           </div>
 
           <div className="relative aspect-[4/3] overflow-hidden rounded-shell border border-white/10 bg-white/[0.035] shadow-panel">

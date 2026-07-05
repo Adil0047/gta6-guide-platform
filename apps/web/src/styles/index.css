@@ -2,6 +2,8 @@
 
 @theme {
   --color-background: #000000;
+  --color-black: #000000;
+  --color-white: #ffffff;
   --color-background-soft: #050507;
   --color-surface: #08080b;
   --color-surface-soft: #111118;

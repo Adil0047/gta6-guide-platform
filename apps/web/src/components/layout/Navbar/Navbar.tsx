@@ -60,11 +60,18 @@ export function Navbar({ className }: NavbarProps) {
             <Search aria-hidden className="size-4" />
           </Link>
 
-          <Link
+          {/* <Link
             to={ROUTES.login}
             className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Sign In
+          </Link> */}
+
+          <Link
+            to={ROUTES.login}
+            className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <span className="text-black">Sign In</span>
           </Link>
         </div>
 
@@ -105,9 +112,9 @@ export function Navbar({ className }: NavbarProps) {
               <Link
                 to={ROUTES.login}
                 onClick={closeMenu}
-                className="mt-2 inline-flex min-h-14 items-center justify-center rounded-2xl bg-white px-5 text-base font-semibold text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="mt-2 inline-flex min-h-14 items-center justify-center rounded-2xl bg-white px-5 text-base font-semibold shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
-                Sign In
+                <span className='text-black'>Sign In</span>
               </Link>
             </div>
           </motion.div>
