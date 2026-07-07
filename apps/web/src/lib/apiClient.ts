@@ -1,11 +1,12 @@
+import { type ApiErrorResponse, type ApiSuccessResponse } from '@gta6-guide/shared/api';
+import { type AuthSessionDto } from '@gta6-guide/shared/dto';
+
 import { env } from '@/app/config/env';
 import {
   clearAuthSession,
   getAccessToken,
   setAuthSession,
 } from '@/features/auth/authSession';
-import { type ApiErrorResponse, type ApiSuccessResponse } from '@gta6-guide/shared/api';
-import { type AuthSessionDto } from '@gta6-guide/shared/dto';
 
 export class ApiError extends Error {
   statusCode: number;
@@ -24,6 +25,25 @@ type ApiClientOptions = RequestInit & {
   requiresAuth?: boolean;
   retryOnUnauthorized?: boolean;
 };
+
+type SessionExpiredHandler = () => void;
+
+let refreshPromise: Promise<string> | null = null;
+let sessionExpiredHandler: SessionExpiredHandler | null = null;
+
+export function setSessionExpiredHandler(handler: SessionExpiredHandler) {
+  sessionExpiredHandler = handler;
+
+  return () => {
+    if (sessionExpiredHandler === handler) {
+      sessionExpiredHandler = null;
+    }
+  };
+}
+
+function notifySessionExpired() {
+  sessionExpiredHandler?.();
+}
 
 function getCookie(name: string) {
   if (typeof document === 'undefined') {
@@ -78,7 +98,7 @@ function shouldRefresh(path: string, status: number, retryOnUnauthorized: boolea
   );
 }
 
-async function refreshSession() {
+async function requestRefreshSession() {
   const response = await fetch(`${env.apiBaseUrl}/auth/refresh`, {
     method: 'POST',
     credentials: 'include',
@@ -88,12 +108,21 @@ async function refreshSession() {
 
   if (!response.ok || !payload || payload.success === false || !payload.data) {
     clearAuthSession();
+    notifySessionExpired();
     throw new ApiError(payload?.message ?? 'Session refresh failed', response.status, payload);
   }
 
   setAuthSession(payload.data);
 
   return payload.data.accessToken;
+}
+
+function refreshSession() {
+  refreshPromise ??= requestRefreshSession().finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
 }
 
 async function requestEnvelope<TData, TMeta = unknown>(
@@ -121,11 +150,14 @@ async function requestEnvelope<TData, TMeta = unknown>(
 
   if (!response.ok || payload?.success === false) {
     if (shouldRefresh(path, response.status, retryOnUnauthorized)) {
-      const refreshedToken = await refreshSession();
+      const latestToken = getAccessToken();
+      const retryToken = latestToken && latestToken !== effectiveToken
+        ? latestToken
+        : await refreshSession();
 
       return requestEnvelope<TData, TMeta>(path, {
         ...options,
-        authToken: refreshedToken,
+        authToken: retryToken,
         retryOnUnauthorized: false,
       });
     }

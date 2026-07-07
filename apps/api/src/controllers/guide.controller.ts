@@ -10,6 +10,7 @@ import {
   listGuides,
   updateGuide,
 } from '@/services/guide.service.js';
+import { recordRecentlyViewed } from '@/services/recentlyViewed.service.js';
 import { createAuditLog } from '@/services/audit.service.js';
 import { asyncHandler } from '@/utils/asyncHandler.js';
 import { sendResponse } from '@/utils/apiResponse.js';
@@ -46,6 +47,10 @@ export const getGuideBySlugController = asyncHandler(async (request, response) =
 
   if (!includeDrafts) {
     await incrementGuideView(getRouteParam(request.params, 'slug'));
+  }
+
+  if (request.user && guide.status === 'published' && guide.visibility === 'public') {
+    await recordRecentlyViewed(request.user.id, guide._id);
   }
 
   sendResponse({

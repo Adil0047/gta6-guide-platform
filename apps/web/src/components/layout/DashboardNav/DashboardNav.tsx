@@ -1,10 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bookmark, Home, LogOut, MessageCircle, Settings, UserRound } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants/routes';
-import { authService } from '@/services';
+import { authService, queryKeys, userService } from '@/services';
 import { cn } from '@/utils/cn';
 
 const userDashboardLinks = [
@@ -30,9 +30,25 @@ const userDashboardLinks = [
   },
 ];
 
+function getInitials(name = '', username = '') {
+  const source = name || username;
+  const initials = source
+    .split(' ')
+    .map((part) => part.trim()[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('');
+
+  return initials.toUpperCase() || 'P';
+}
+
 export function DashboardNav() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const userQuery = useQuery({
+    queryKey: queryKeys.me,
+    queryFn: userService.getMe,
+  });
   const logoutMutation = useMutation({
     mutationFn: authService.logout,
     onSuccess: () => {
@@ -40,16 +56,23 @@ export function DashboardNav() {
       navigate(ROUTES.login, { replace: true });
     },
   });
+  const user = userQuery.data;
 
   return (
     <aside className="rounded-panel border border-white/10 bg-white/[0.04] p-4 shadow-panel backdrop-blur-xl">
       <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-        <div className="grid size-11 place-items-center rounded-2xl border border-neon-cyan/20 bg-neon-cyan/10 text-neon-cyan">
-          <UserRound aria-hidden className="size-5" />
-        </div>
-        <div>
-          <p className="text-sm font-bold text-white">Player profile</p>
-          <p className="text-xs text-text-muted">Mock user workspace</p>
+        {user?.avatar ? (
+          <img src={user.avatar} alt="" className="size-11 rounded-2xl object-cover" />
+        ) : (
+          <div className="grid size-11 place-items-center rounded-2xl border border-neon-cyan/20 bg-neon-cyan/10 text-sm font-black text-neon-cyan">
+            {user ? getInitials(user.name, user.username) : <UserRound aria-hidden className="size-5" />}
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold text-white">{user?.name ?? 'Player profile'}</p>
+          <p className="truncate text-xs text-text-muted">
+            {user ? `@${user.username} · ${user.role}` : 'Signed-in account'}
+          </p>
         </div>
       </div>
 
@@ -67,18 +90,15 @@ export function DashboardNav() {
                   'flex min-h-12 items-center gap-3 rounded-2xl px-4 text-sm font-semibold transition',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                   isActive
-                    ? 'bg-white text-black'
-                    : 'text-text-secondary hover:bg-white/[0.07] hover:text-white',
+                    ? 'border border-neon-cyan/30 bg-neon-cyan/10 text-white shadow-[0_0_24px_rgba(0,245,255,0.08)]'
+                    : 'border border-transparent text-text-secondary hover:border-white/10 hover:bg-white/[0.07] hover:text-white',
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon
-                    aria-hidden
-                    className={cn('size-5', isActive ? 'text-black' : 'text-neon-cyan')}
-                  />
-                  <span className={isActive ? 'text-black' : ''}>{link.label}</span>
+                  <Icon aria-hidden className={cn('size-5', isActive ? 'text-neon-cyan' : 'text-text-muted')} />
+                  <span>{link.label}</span>
                 </>
               )}
             </NavLink>

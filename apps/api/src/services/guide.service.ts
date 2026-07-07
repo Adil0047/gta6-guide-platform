@@ -8,6 +8,7 @@ import { BookmarkModel } from '@/models/Bookmark.model.js';
 import { CategoryModel } from '@/models/Category.model.js';
 import { CommentModel } from '@/models/Comment.model.js';
 import { GuideModel } from '@/models/Guide.model.js';
+import { RecentlyViewedModel } from '@/models/RecentlyViewed.model.js';
 import { AppError } from '@/utils/appError.js';
 type CreateGuideInput = CreateGuideDto;
 
@@ -221,6 +222,7 @@ export async function deleteGuide(id: string) {
   await Promise.all([
     BookmarkModel.deleteMany({ guideId: guide._id }),
     CommentModel.deleteMany({ guideId: guide._id }),
+    RecentlyViewedModel.deleteMany({ guideId: guide._id }),
   ]);
 
   return guide;

@@ -7,7 +7,7 @@ import { SectionHeader } from '@/components/common';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Textarea } from '@/components/ui/Textarea';
-import { getAuthSession } from '@/features/auth/authSession';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { bookmarkService, commentService, queryKeys } from '@/services';
 import { type Guide } from '@/types/content';
 import { formatDate } from '@/utils/formatDate';
@@ -21,13 +21,12 @@ type GuideArticleProps = {
 export function GuideArticle({ guide, allGuides }: GuideArticleProps) {
   const [commentBody, setCommentBody] = useState('');
   const queryClient = useQueryClient();
-  const session = getAuthSession();
-  const isAuthenticated = Boolean(session);
+  const { isAuthenticated, isRestoring } = useAuth();
 
   const bookmarkStatusQuery = useQuery({
     queryKey: queryKeys.bookmarkStatus(guide.id),
     queryFn: () => bookmarkService.getBookmarkStatus(guide.id),
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !isRestoring,
   });
   const commentsQuery = useQuery({
     queryKey: queryKeys.guideComments(guide.id, { limit: 20 }),
@@ -120,7 +119,12 @@ export function GuideArticle({ guide, allGuides }: GuideArticleProps) {
                     toggleBookmarkMutation.mutate();
                   }
                 }}
-                disabled={!isAuthenticated || toggleBookmarkMutation.isPending || bookmarkStatusQuery.isLoading}
+                disabled={
+                  !isAuthenticated ||
+                  isRestoring ||
+                  toggleBookmarkMutation.isPending ||
+                  bookmarkStatusQuery.isLoading
+                }
               >
                 <Bookmark aria-hidden className="mr-2 size-4" />
                 {isBookmarked ? 'Saved guide' : 'Save guide'}

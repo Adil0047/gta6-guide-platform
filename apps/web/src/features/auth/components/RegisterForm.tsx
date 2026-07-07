@@ -21,6 +21,10 @@ export function RegisterForm() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (password.length < 8) {
+      return;
+    }
+
     if (password !== confirmPassword) {
       return;
     }
@@ -33,7 +37,9 @@ export function RegisterForm() {
     });
   }
 
-  const passwordsMismatch = Boolean(confirmPassword) && password !== confirmPassword;
+  const passwordTooShort = Boolean(password) && password.length < 8;
+  const passwordsMismatch =
+    Boolean(confirmPassword) && password !== confirmPassword;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -48,6 +54,7 @@ export function RegisterForm() {
           setName(event.target.value);
         }}
       />
+
       <AuthInput
         label="Username"
         type="text"
@@ -59,6 +66,7 @@ export function RegisterForm() {
           setUsername(event.target.value);
         }}
       />
+
       <AuthInput
         label="Email address"
         type="email"
@@ -70,17 +78,25 @@ export function RegisterForm() {
           setEmail(event.target.value);
         }}
       />
-      <AuthInput
-        label="Password"
-        type="password"
-        autoComplete="new-password"
-        required
-        placeholder="Create a strong password"
-        value={password}
-        onChange={(event) => {
-          setPassword(event.target.value);
-        }}
-      />
+
+      <div>
+        <AuthInput
+          label="Password"
+          type="password"
+          autoComplete="new-password"
+          required
+          placeholder="Create a strong password"
+          value={password}
+          onChange={(event) => {
+            setPassword(event.target.value);
+          }}
+        />
+
+        <p className="mt-2 text-xs text-text-muted">
+          Password must be at least 8 characters long.
+        </p>
+      </div>
+
       <AuthInput
         label="Confirm password"
         type="password"
@@ -93,9 +109,25 @@ export function RegisterForm() {
         }}
       />
 
-      <Button type="submit" className="w-full" disabled={registerMutation.isPending || passwordsMismatch}>
-        {registerMutation.isPending ? 'Creating account…' : 'Create account'}
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={
+          registerMutation.isPending ||
+          passwordTooShort ||
+          passwordsMismatch
+        }
+      >
+        {registerMutation.isPending
+          ? 'Creating account…'
+          : 'Create account'}
       </Button>
+
+      {passwordTooShort ? (
+        <p className="rounded-2xl border border-danger/20 bg-danger/10 px-4 py-3 text-sm text-danger">
+          Password must be at least 8 characters long.
+        </p>
+      ) : null}
 
       {passwordsMismatch ? (
         <p className="rounded-2xl border border-danger/20 bg-danger/10 px-4 py-3 text-sm text-danger">
@@ -105,7 +137,11 @@ export function RegisterForm() {
 
       {registerMutation.isSuccess ? (
         <p className="rounded-2xl border border-neon-cyan/20 bg-neon-cyan/10 px-4 py-3 text-sm text-neon-cyan">
-          Account created. <Link to={ROUTES.login} className="font-bold underline">Sign in</Link> to continue.
+          Account created.{' '}
+          <Link to={ROUTES.login} className="font-bold underline">
+            Sign in
+          </Link>{' '}
+          to continue.
         </p>
       ) : null}
 

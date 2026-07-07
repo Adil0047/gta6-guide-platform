@@ -4,24 +4,45 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { SectionHeader } from '@/components/common';
 import { ErrorState } from '@/components/feedback';
 import { FormField } from '@/components/forms';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Spinner } from '@/components/ui/Spinner';
+import { updateAuthSessionUser } from '@/features/auth/authSession';
 import { queryKeys, userService } from '@/services';
+import { formatDate } from '@/utils/formatDate';
+
+function getInitials(name: string, username: string) {
+  const source = name || username;
+  const initials = source
+    .split(' ')
+    .map((part) => part.trim()[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('');
+
+  return initials.toUpperCase() || 'P';
+}
 
 export function UserSettingsForm() {
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
+  const [avatar, setAvatar] = useState('');
   const [notificationPreference, setNotificationPreference] = useState('editorial');
   const [saved, setSaved] = useState(false);
 
   const userQuery = useQuery({
     queryKey: queryKeys.me,
     queryFn: userService.getMe,
+  });
+  const dashboardQuery = useQuery({
+    queryKey: queryKeys.userDashboard,
+    queryFn: userService.getDashboard,
   });
 
   const updateProfileMutation = useMutation({
@@ -43,10 +64,12 @@ export function UserSettingsForm() {
     },
     onSuccess: (user) => {
       queryClient.setQueryData(queryKeys.me, user);
+      updateAuthSessionUser(user);
       setSaved(true);
     },
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.me });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.userDashboard });
     },
   });
 
@@ -58,6 +81,7 @@ export function UserSettingsForm() {
     setName(userQuery.data.name);
     setUsername(userQuery.data.username);
     setBio(userQuery.data.bio ?? '');
+    setAvatar(userQuery.data.avatar ?? '');
     setNotificationPreference(
       userQuery.data.preferences &&
         typeof userQuery.data.preferences === 'object' &&
@@ -75,6 +99,7 @@ export function UserSettingsForm() {
       name,
       username,
       bio,
+      avatar,
       preferences: {
         notifications: {
           editorial: notificationPreference !== 'none',
@@ -85,6 +110,9 @@ export function UserSettingsForm() {
     });
   }
 
+  const user = userQuery.data;
+  const stats = dashboardQuery.data?.stats;
+
   return (
     <div>
       <SectionHeader
@@ -92,6 +120,56 @@ export function UserSettingsForm() {
         title="Profile preferences"
         description="Manage account fields persisted through the backend profile endpoint."
       />
+
+      <Card className="mt-8 p-6">
+        {userQuery.isLoading ? (
+          <div className="flex items-center gap-4">
+            <Skeleton className="size-16 rounded-3xl" />
+            <div className="flex-1 space-y-3">
+              <Skeleton className="h-5 w-48" />
+              <Skeleton className="h-4 w-72 max-w-full" />
+            </div>
+          </div>
+        ) : null}
+
+        {user ? (
+          <div className="grid gap-6 lg:grid-cols-[auto_1fr]">
+            {user.avatar ? (
+              <img src={user.avatar} alt="" className="size-20 rounded-3xl border border-neon-cyan/30 object-cover" />
+            ) : (
+              <div className="grid size-20 place-items-center rounded-3xl border border-neon-cyan/30 bg-neon-cyan/10 text-2xl font-black text-neon-cyan">
+                {getInitials(user.name, user.username)}
+              </div>
+            )}
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="text-2xl font-black text-white">{user.name}</h2>
+                <Badge variant="cyan">{user.role}</Badge>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-text-secondary">
+                @{user.username} · {user.email} · Joined {user.createdAt ? formatDate(user.createdAt) : 'recently'}
+              </p>
+              <p className="mt-3 text-sm leading-7 text-text-secondary">
+                {user.bio || 'Add a short bio to complete your public profile.'}
+              </p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-text-muted">Bookmarks</p>
+                  <p className="mt-2 text-2xl font-black text-white">{stats?.totalBookmarks ?? 0}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-text-muted">Comments</p>
+                  <p className="mt-2 text-2xl font-black text-white">{stats?.totalComments ?? 0}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-text-muted">Completion</p>
+                  <p className="mt-2 text-2xl font-black text-white">{stats?.profileCompletion === undefined ? '—' : `${stats.profileCompletion}%`}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Card>
 
       <Card className="mt-8 p-6">
         {userQuery.isLoading ? (
@@ -141,6 +219,19 @@ export function UserSettingsForm() {
                   value={bio}
                   onChange={(event) => {
                     setBio(event.target.value);
+                  }}
+                />
+              )}
+            </FormField>
+
+            <FormField label="Avatar URL">
+              {(id) => (
+                <Input
+                  id={id}
+                  value={avatar}
+                  placeholder="https://example.com/avatar.png"
+                  onChange={(event) => {
+                    setAvatar(event.target.value);
                   }}
                 />
               )}

@@ -54,3 +54,9 @@ export {
   updateComment,
   updateCommentStatus,
 } from './comment.service.js';
+
+export {
+  getUserDashboard,
+  listRecentlyViewed,
+  recordRecentlyViewed,
+} from './recentlyViewed.service.js';

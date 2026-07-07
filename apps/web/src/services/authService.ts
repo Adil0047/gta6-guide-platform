@@ -8,6 +8,8 @@ import {
 import { clearAuthSession, setAuthSession } from '@/features/auth/authSession';
 import { apiClient } from '@/lib/apiClient';
 
+let refreshSessionPromise: Promise<AuthSessionDto> | null = null;
+
 export const authService = {
   async login(input: LoginRequestDto) {
     const session = await apiClient.post<AuthSessionDto>('/auth/login', input, {
@@ -25,12 +27,20 @@ export const authService = {
   },
 
   async refresh() {
-    const session = await apiClient.post<AuthSessionDto>('/auth/refresh', undefined, {
-      retryOnUnauthorized: false,
-    });
-    setAuthSession(session);
+    refreshSessionPromise ??= apiClient
+      .post<AuthSessionDto>('/auth/refresh', undefined, {
+        retryOnUnauthorized: false,
+      })
+      .then((session) => {
+        setAuthSession(session);
 
-    return session;
+        return session;
+      })
+      .finally(() => {
+        refreshSessionPromise = null;
+      });
+
+    return refreshSessionPromise;
   },
 
   async logout() {
@@ -38,6 +48,8 @@ export const authService = {
       await apiClient.post<unknown>('/auth/logout', undefined, {
         retryOnUnauthorized: false,
       });
+    } catch {
+      // Frontend session cleanup must still complete if the network request fails.
     } finally {
       clearAuthSession();
     }

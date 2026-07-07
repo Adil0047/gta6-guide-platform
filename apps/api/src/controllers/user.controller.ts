@@ -7,6 +7,7 @@ import {
   updateUserRole,
   updateUserStatus,
 } from '@/services/user.service.js';
+import { getUserDashboard } from '@/services/recentlyViewed.service.js';
 import { createAuditLog } from '@/services/audit.service.js';
 import { asyncHandler } from '@/utils/asyncHandler.js';
 import { sendResponse } from '@/utils/apiResponse.js';
@@ -20,6 +21,18 @@ export const getMeController = asyncHandler(async (request, response) => {
     statusCode: StatusCodes.OK,
     message: 'Profile retrieved successfully',
     data: user,
+  });
+});
+
+
+export const getMeDashboardController = asyncHandler(async (request, response) => {
+  const dashboard = await getUserDashboard(request.user!.id);
+
+  sendResponse({
+    response,
+    statusCode: StatusCodes.OK,
+    message: 'Dashboard retrieved successfully',
+    data: dashboard,
   });
 });
 

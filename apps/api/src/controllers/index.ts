@@ -28,6 +28,7 @@ export { searchController } from './search.controller.js';
 
 export {
   getMeController,
+  getMeDashboardController,
   listUsersController,
   updateMeController,
   updateUserRoleController,

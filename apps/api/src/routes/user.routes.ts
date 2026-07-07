@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import {
   getMeController,
+  getMeDashboardController,
   listUsersController,
   updateMeController,
   updateUserRoleController,
@@ -22,6 +23,7 @@ export const userRouter = Router();
 userRouter.use(requireAuth);
 
 userRouter.get('/me', getMeController);
+userRouter.get('/me/dashboard', getMeDashboardController);
 userRouter.patch('/me', validate(updateProfileSchema), updateMeController);
 
 userRouter.get(

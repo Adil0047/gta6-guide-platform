@@ -11,5 +11,5 @@ export { commentService, type CommentItem } from './commentService';
 export { authService } from './authService';
 export { contentService } from './contentService';
 export { queryKeys } from './queryKeys';
-export { userService } from './userService';
+export { userService, type UserDashboard, type UserDashboardStats } from './userService';
 export type { PaginatedResult } from './contentService';

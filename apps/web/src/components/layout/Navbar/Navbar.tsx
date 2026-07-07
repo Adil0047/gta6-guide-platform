@@ -1,13 +1,17 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Menu, Search, X } from 'lucide-react';
 import { useCallback, useId, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { isAdminRole } from '@/features/auth/authSession';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
+import { authService } from '@/services';
 import { cn } from '@/utils/cn';
 
 import { DesktopNavLink } from './DesktopNavLink';
@@ -16,15 +20,44 @@ import { NAVBAR_LINKS } from './navbar.constants';
 import { NavbarLogo } from './NavbarLogo';
 import { type NavbarProps } from './navbar.types';
 
+const desktopAuthLinkClass =
+  'inline-flex h-11 items-center justify-center rounded-full bg-white/[0.05] px-4 text-sm font-semibold text-text-secondary ring-1 ring-white/10 transition hover:bg-white/[0.09] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background';
+
+const desktopPrimaryAuthLinkClass =
+  'inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background';
+
+const mobileAuthLinkClass =
+  'inline-flex min-h-12 items-center justify-center rounded-2xl bg-white/[0.05] px-5 text-base font-semibold text-text-secondary ring-1 ring-white/10 transition hover:bg-white/[0.09] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background';
+
+const mobilePrimaryAuthLinkClass =
+  'mt-2 inline-flex min-h-14 items-center justify-center rounded-2xl bg-white px-5 text-base font-semibold text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background';
+
 export function Navbar({ className }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const hasScrolled = useScrollPosition(8);
   const mobileMenuId = useId();
   const shouldReduceMotion = useReducedMotion();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { user, isRestoring } = useAuth();
+  const isAdmin = user ? isAdminRole(user.role) : false;
 
   const closeMenu = useCallback(() => {
     setIsMenuOpen(false);
   }, []);
+
+  const logoutMutation = useMutation({
+    mutationFn: authService.logout,
+    onSuccess: () => {
+      queryClient.clear();
+      navigate(ROUTES.login, { replace: true });
+    },
+  });
+
+  const handleLogout = useCallback(() => {
+    closeMenu();
+    logoutMutation.mutate();
+  }, [closeMenu, logoutMutation]);
 
   useBodyScrollLock(isMenuOpen);
   useEscapeKey({ enabled: isMenuOpen, onEscape: closeMenu });
@@ -60,19 +93,37 @@ export function Navbar({ className }: NavbarProps) {
             <Search aria-hidden className="size-4" />
           </Link>
 
-          {/* <Link
-            to={ROUTES.login}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
-            Sign In
-          </Link> */}
-
-          <Link
-            to={ROUTES.login}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
-            <span className="text-black">Sign In</span>
-          </Link>
+          {isRestoring ? (
+            <span className="inline-flex h-11 w-28 items-center justify-center rounded-full bg-white/[0.05] text-sm font-semibold text-text-muted ring-1 ring-white/10">
+              Checking…
+            </span>
+          ) : user ? (
+            <>
+              {isAdmin ? (
+                <Link to={ROUTES.admin} className={desktopAuthLinkClass}>
+                  Admin Dashboard
+                </Link>
+              ) : null}
+              <Link to={ROUTES.dashboard} className={desktopAuthLinkClass}>
+                Dashboard
+              </Link>
+              <Link to={ROUTES.dashboardSettings} className={desktopAuthLinkClass}>
+                Profile
+              </Link>
+              <button
+                type="button"
+                className={desktopPrimaryAuthLinkClass}
+                disabled={logoutMutation.isPending}
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link to={ROUTES.login} className={desktopPrimaryAuthLinkClass}>
+              <span className='text-black'>Sign In</span>
+            </Link>
+          )}
         </div>
 
         <Button
@@ -109,13 +160,37 @@ export function Navbar({ className }: NavbarProps) {
                 <MobileNavLink key={link.href} {...link} onClick={closeMenu} />
               ))}
 
-              <Link
-                to={ROUTES.login}
-                onClick={closeMenu}
-                className="mt-2 inline-flex min-h-14 items-center justify-center rounded-2xl bg-white px-5 text-base font-semibold shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              >
-                <span className='text-black'>Sign In</span>
-              </Link>
+              {isRestoring ? (
+                <span className="mt-2 inline-flex min-h-14 items-center justify-center rounded-2xl bg-white/[0.05] px-5 text-base font-semibold text-text-muted ring-1 ring-white/10">
+                  Checking session…
+                </span>
+              ) : user ? (
+                <>
+                  {isAdmin ? (
+                    <Link to={ROUTES.admin} onClick={closeMenu} className={mobileAuthLinkClass}>
+                      Admin Dashboard
+                    </Link>
+                  ) : null}
+                  <Link to={ROUTES.dashboard} onClick={closeMenu} className={mobileAuthLinkClass}>
+                    Dashboard
+                  </Link>
+                  <Link to={ROUTES.dashboardSettings} onClick={closeMenu} className={mobileAuthLinkClass}>
+                    Profile
+                  </Link>
+                  <button
+                    type="button"
+                    className={mobilePrimaryAuthLinkClass}
+                    disabled={logoutMutation.isPending}
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link to={ROUTES.login} onClick={closeMenu} className={mobilePrimaryAuthLinkClass}>
+                  Sign In
+                </Link>
+              )}
             </div>
           </motion.div>
         ) : null}

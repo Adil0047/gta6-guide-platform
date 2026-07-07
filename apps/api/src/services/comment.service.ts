@@ -7,6 +7,12 @@ import { StatusCodes } from 'http-status-codes';
 import { CommentModel } from '@/models/Comment.model.js';
 import { GuideModel } from '@/models/Guide.model.js';
 import { AppError } from '@/utils/appError.js';
+import {
+  getDocumentId,
+  serializeObjectIdOrDocument,
+  toObjectId,
+  toObjectIdHexString,
+} from '@/utils/objectId.js';
 
 type CreateCommentInput = CreateCommentDto;
 type UpdateCommentInput = UpdateCommentDto;
@@ -23,7 +29,7 @@ type RequestUser = {
 
 type PopulatedCommentRecord = {
   _id?: unknown;
-  id?: string;
+  id?: unknown;
   guideId: unknown;
   userId: unknown;
   parentId?: unknown;
@@ -34,16 +40,22 @@ type PopulatedCommentRecord = {
   updatedAt?: Date;
 };
 
-function getRecordId(record: { _id?: unknown; id?: string }) {
-  return record.id ?? String(record._id ?? '');
+function requireObjectId(value: unknown, fieldName: string) {
+  const objectId = toObjectId(value);
+
+  if (!objectId) {
+    throw new AppError(`Invalid ${fieldName}`, StatusCodes.BAD_REQUEST);
+  }
+
+  return objectId;
 }
 
 function serializeComment(comment: PopulatedCommentRecord): CommentDto {
   return {
-    id: getRecordId(comment),
-    guideId: comment.guideId as CommentDto['guideId'],
-    userId: comment.userId as CommentDto['userId'],
-    parentId: comment.parentId as CommentDto['parentId'],
+    id: getDocumentId(comment),
+    guideId: serializeObjectIdOrDocument(comment.guideId) as CommentDto['guideId'],
+    userId: serializeObjectIdOrDocument(comment.userId) as CommentDto['userId'],
+    parentId: serializeObjectIdOrDocument(comment.parentId) as CommentDto['parentId'],
     body: comment.body,
     status: comment.status,
     isEdited: Boolean(comment.isEdited),
@@ -63,22 +75,25 @@ function populateCommentQuery<TQuery extends PopulatableQuery<TQuery>>(query: TQ
     .populate('parentId', 'body status userId createdAt');
 }
 
-async function ensurePublicGuide(guideId: string) {
-  const guide = await GuideModel.findOne({ _id: guideId, status: 'published', visibility: 'public' })
+async function ensurePublicGuide(guideId: unknown) {
+  const guideObjectId = requireObjectId(guideId, 'guide id');
+  const guide = await GuideModel.findOne({ _id: guideObjectId, status: 'published', visibility: 'public' })
     .select('_id')
     .lean();
 
   if (!guide) {
     throw new AppError('Guide not found', StatusCodes.NOT_FOUND);
   }
+
+  return guideObjectId;
 }
 
 export async function listGuideComments(guideId: string, query: unknown) {
-  await ensurePublicGuide(guideId);
+  const guideObjectId = await ensurePublicGuide(guideId);
 
   const { page, limit, skip } = getPagination(query);
   const filter = {
-    guideId,
+    guideId: guideObjectId,
     status: COMMENT_STATUSES.APPROVED,
   };
 
@@ -98,8 +113,9 @@ export async function listGuideComments(guideId: string, query: unknown) {
 }
 
 export async function listMyComments(userId: string, query: unknown) {
+  const userObjectId = requireObjectId(userId, 'user id');
   const { page, limit, skip } = getPagination(query);
-  const filter = { userId };
+  const filter = { userId: userObjectId };
 
   const [items, total] = await Promise.all([
     populateCommentQuery(CommentModel.find(filter))
@@ -122,7 +138,7 @@ export async function listComments(query: unknown) {
   const filter: Record<string, unknown> = {};
 
   if (parsedQuery.guideId) {
-    filter.guideId = parsedQuery.guideId;
+    filter.guideId = requireObjectId(parsedQuery.guideId, 'guide id');
   }
 
   if (parsedQuery.status) {
@@ -145,17 +161,19 @@ export async function listComments(query: unknown) {
 }
 
 export async function createComment(userId: string, input: CreateCommentInput) {
-  await ensurePublicGuide(input.guideId);
+  const userObjectId = requireObjectId(userId, 'user id');
+  const guideObjectId = await ensurePublicGuide(input.guideId);
+  const parentObjectId = input.parentId ? requireObjectId(input.parentId, 'parent comment id') : undefined;
 
   const comment = await CommentModel.create({
-    userId,
-    guideId: input.guideId,
-    parentId: input.parentId,
+    userId: userObjectId,
+    guideId: guideObjectId,
+    parentId: parentObjectId,
     body: input.body,
     status: COMMENT_STATUSES.PENDING,
   });
 
-  await GuideModel.findByIdAndUpdate(input.guideId, {
+  await GuideModel.findByIdAndUpdate(guideObjectId, {
     $inc: {
       'metrics.commentCount': 1,
     },
@@ -171,13 +189,14 @@ export async function createComment(userId: string, input: CreateCommentInput) {
 }
 
 export async function updateComment(id: string, user: RequestUser, input: UpdateCommentInput) {
-  const currentComment = await CommentModel.findById(id);
+  const commentObjectId = requireObjectId(id, 'comment id');
+  const currentComment = await CommentModel.findById(commentObjectId);
 
   if (!currentComment) {
     throw new AppError('Comment not found', StatusCodes.NOT_FOUND);
   }
 
-  if (String(currentComment.userId) !== user.id && !isAdminRole(user.role)) {
+  if (toObjectIdHexString(currentComment.userId) !== user.id && !isAdminRole(user.role)) {
     throw new AppError('You can only edit your own comments', StatusCodes.FORBIDDEN);
   }
 
@@ -196,9 +215,10 @@ export async function updateComment(id: string, user: RequestUser, input: Update
 }
 
 export async function updateCommentStatus(id: string, status: CommentStatus) {
+  const commentObjectId = requireObjectId(id, 'comment id');
   const comment = await populateCommentQuery(
     CommentModel.findByIdAndUpdate(
-      id,
+      commentObjectId,
       { status },
       {
         new: true,
@@ -215,17 +235,18 @@ export async function updateCommentStatus(id: string, status: CommentStatus) {
 }
 
 export async function deleteComment(id: string, user: RequestUser) {
-  const currentComment = await CommentModel.findById(id).lean();
+  const commentObjectId = requireObjectId(id, 'comment id');
+  const currentComment = await CommentModel.findById(commentObjectId).lean();
 
   if (!currentComment) {
     throw new AppError('Comment not found', StatusCodes.NOT_FOUND);
   }
 
-  if (String(currentComment.userId) !== user.id && !isAdminRole(user.role)) {
+  if (toObjectIdHexString(currentComment.userId) !== user.id && !isAdminRole(user.role)) {
     throw new AppError('You can only delete your own comments', StatusCodes.FORBIDDEN);
   }
 
-  const comment = await CommentModel.findByIdAndDelete(id).lean();
+  const comment = await CommentModel.findByIdAndDelete(commentObjectId).lean();
 
   if (!comment) {
     throw new AppError('Comment not found', StatusCodes.NOT_FOUND);

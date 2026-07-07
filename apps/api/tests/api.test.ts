@@ -291,6 +291,37 @@ test(
 
       assert.equal(approveResponse.status, 200);
 
+      const viewedGuideResponse = await fetch(`${baseUrl}/guides/slug/${guide.slug}`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      });
+
+      assert.equal(viewedGuideResponse.status, 200);
+
+      const dashboardResponse = await fetch(`${baseUrl}/users/me/dashboard`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      });
+      const dashboard = await readJson<{
+        stats: {
+          totalBookmarks: number;
+          totalComments: number;
+          recentlyViewedCount: number;
+          publishedCommentsCount: number;
+        };
+        recentBookmarks: Array<{ id: string; guideId: { slug?: string } }>;
+        recentComments: Array<{ id: string; guideId: { slug?: string } }>;
+        recentlyViewedGuides: Array<{ id: string; guideId: { slug?: string } }>;
+        recommendations: Array<{ slug: string }>;
+      }>(dashboardResponse);
+
+      assert.equal(dashboardResponse.status, 200);
+      assert.equal(dashboard.data?.stats.totalBookmarks, 1);
+      assert.equal(dashboard.data?.stats.totalComments, 1);
+      assert.equal(dashboard.data?.stats.recentlyViewedCount, 1);
+      assert.equal(dashboard.data?.stats.publishedCommentsCount, 1);
+      assert.equal(dashboard.data?.recentBookmarks[0]?.guideId.slug, guide.slug);
+      assert.equal(dashboard.data?.recentComments[0]?.guideId.slug, guide.slug);
+      assert.equal(dashboard.data?.recentlyViewedGuides[0]?.guideId.slug, guide.slug);
+
       const createCategoryResponse = await fetch(`${baseUrl}/categories`, {
         method: 'POST',
         headers: {
@@ -360,6 +391,18 @@ test(
 
       assert.equal(createGuideResponse.status, 201);
       assert.ok(createdGuideId);
+
+      const dashboardWithRecommendationsResponse = await fetch(`${baseUrl}/users/me/dashboard`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      });
+      const dashboardWithRecommendations = await readJson<{
+        recommendations: Array<{ slug: string }>;
+      }>(dashboardWithRecommendationsResponse);
+
+      assert.equal(dashboardWithRecommendationsResponse.status, 200);
+      assert.ok(
+        dashboardWithRecommendations.data?.recommendations.some((item) => item.slug === 'fastest-cars-route-guide'),
+      );
 
       const updateGuideResponse = await fetch(`${baseUrl}/guides/${createdGuideId}`, {
         method: 'PATCH',

@@ -18,6 +18,10 @@ export function LoginForm() {
     mutationFn: authService.login,
     onSuccess: (session) => {
       queryClient.setQueryData(queryKeys.me, session.user);
+      void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+      void queryClient.invalidateQueries({ queryKey: ['comments', 'me'] });
+      void queryClient.invalidateQueries({ queryKey: ['admin'] });
+      void queryClient.invalidateQueries({ queryKey: ['users'] });
       navigate(searchParams.get('redirectTo') ?? ROUTES.dashboard, { replace: true });
     },
   });

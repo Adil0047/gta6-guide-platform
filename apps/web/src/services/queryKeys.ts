@@ -12,4 +12,5 @@ export const queryKeys = {
   search: (params?: Record<string, unknown>) => ['search', params ?? {}] as const,
   users: (params?: Record<string, unknown>) => ['users', params ?? {}] as const,
   me: ['users', 'me'] as const,
+  userDashboard: ['users', 'me', 'dashboard'] as const,
 };
