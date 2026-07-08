@@ -38,18 +38,20 @@ Render can generate secret values for the JWT and cookie secrets when using the 
 
 ## Frontend on Vercel
 
-`vercel.json` configures the monorepo build:
+`vercel.json` configures the monorepo build. The frontend build runs through the root workspace so `packages/shared` is compiled before Vite bundles `apps/web`:
 
-- Install command: `pnpm install --frozen-lockfile`
-- Build command: `pnpm build:web`
+- Install command: `corepack enable && pnpm install --frozen-lockfile --prod=false`
+- Build command: `pnpm vercel-build`
 - Output directory: `apps/web/dist`
 
-Required Vercel environment variables:
+Recommended Vercel environment variables:
 
 - `VITE_APP_NAME=GTA VI Guide Platform`
 - `VITE_APP_ENV=production`
 - `VITE_API_BASE_URL=https://your-render-api.onrender.com/api/v1`
 - `VITE_SITE_URL=https://your-production-domain.com`
+
+The web app has safe build-time fallbacks for these values, but production should still set them in Vercel so API requests and SEO URLs point to the correct deployed services.
 
 ## Production cookies and CORS
 

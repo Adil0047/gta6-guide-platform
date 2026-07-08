@@ -12,7 +12,9 @@
     "typecheck": "tsc -b --noEmit",
     "predev": "pnpm --filter @gta6-guide/shared build",
     "test": "tsx --tsconfig tsconfig.app.json --test tests/*.test.tsx",
-    "prebuild": "node scripts/generate-seo-files.mjs"
+    "prebuild": "pnpm --filter @gta6-guide/shared build && node scripts/generate-seo-files.mjs",
+    "pretypecheck": "pnpm --filter @gta6-guide/shared build",
+    "pretest": "pnpm --filter @gta6-guide/shared build"
   },
   "dependencies": {
     "@gta6-guide/shared": "workspace:*",

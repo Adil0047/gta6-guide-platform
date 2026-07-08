@@ -4,46 +4,46 @@
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./api": {
-      "types": "./src/types/api.ts",
+      "types": "./dist/types/api.d.ts",
       "import": "./dist/types/api.js"
     },
     "./content": {
-      "types": "./src/constants/content.ts",
+      "types": "./dist/constants/content.d.ts",
       "import": "./dist/constants/content.js"
     },
     "./dto": {
-      "types": "./src/types/dto.ts",
+      "types": "./dist/types/dto.d.ts",
       "import": "./dist/types/dto.js"
     },
     "./pagination": {
-      "types": "./src/pagination.ts",
+      "types": "./dist/pagination.d.ts",
       "import": "./dist/pagination.js"
     },
     "./roles": {
-      "types": "./src/constants/roles.ts",
+      "types": "./dist/constants/roles.d.ts",
       "import": "./dist/constants/roles.js"
     },
     "./schemas": {
-      "types": "./src/schemas/index.ts",
+      "types": "./dist/schemas/index.d.ts",
       "import": "./dist/schemas/index.js"
     },
     "./slug": {
-      "types": "./src/utils/slug.ts",
+      "types": "./dist/utils/slug.d.ts",
       "import": "./dist/utils/slug.js"
     },
     "./users": {
-      "types": "./src/constants/users.ts",
+      "types": "./dist/constants/users.d.ts",
       "import": "./dist/constants/users.js"
     },
     "./community": {
-      "types": "./src/constants/community.ts",
+      "types": "./dist/constants/community.d.ts",
       "import": "./dist/constants/community.js"
     }
   },

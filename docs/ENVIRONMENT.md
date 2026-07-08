@@ -34,10 +34,10 @@
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `VITE_APP_NAME` | Yes | App display name. |
-| `VITE_APP_ENV` | Yes | `development`, `staging`, or `production`. |
-| `VITE_API_BASE_URL` | Yes | Full API base URL, including `/api/v1`. |
-| `VITE_SITE_URL` | Yes | Canonical public site URL for SEO. |
+| `VITE_APP_NAME` | Recommended | App display name. Defaults to `GTA VI Guide Platform` if omitted. |
+| `VITE_APP_ENV` | Recommended | `development`, `staging`, or `production`. Defaults to the Vite mode-derived value if omitted. |
+| `VITE_API_BASE_URL` | Recommended | Full API base URL, including `/api/v1`. Defaults to `/api/v1` so the frontend still builds without a Vercel variable. |
+| `VITE_SITE_URL` | Recommended | Canonical public site URL for SEO. Defaults to the browser origin at runtime if omitted. |
 
 ## Secret generation
 

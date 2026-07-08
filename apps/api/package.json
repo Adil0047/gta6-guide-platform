@@ -13,7 +13,10 @@
     "typecheck": "tsc --noEmit",
     "predev": "pnpm --filter @gta6-guide/shared build",
     "seed": "tsx --tsconfig tsconfig.json src/scripts/seed.ts",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "prebuild": "pnpm --filter @gta6-guide/shared build",
+    "pretypecheck": "pnpm --filter @gta6-guide/shared build",
+    "pretest": "pnpm --filter @gta6-guide/shared build"
   },
   "dependencies": {
     "@gta6-guide/shared": "workspace:*",

@@ -50,3 +50,7 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+# TypeScript / runtime caches
+*.tsbuildinfo
+node-compile-cache/
+
