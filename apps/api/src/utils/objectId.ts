@@ -5,13 +5,24 @@ type DocumentIdLike = {
   id?: unknown;
 };
 
+// function isRawObjectId(value: unknown) {
+//   return (
+//     value instanceof Types.ObjectId ||
+//     (Boolean(value) &&
+//       typeof value === 'object' &&
+//       !('_id' in value) &&
+//       typeof (value as { toHexString?: unknown }).toHexString === 'function')
+//   );
+// }
+
 function isRawObjectId(value: unknown) {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
   return (
     value instanceof Types.ObjectId ||
-    (Boolean(value) &&
-      typeof value === 'object' &&
-      !('_id' in value) &&
-      typeof (value as { toHexString?: unknown }).toHexString === 'function')
+    (!('_id' in value) && typeof (value as { toHexString?: unknown }).toHexString === 'function')
   );
 }
 

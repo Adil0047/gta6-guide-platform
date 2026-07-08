@@ -188,7 +188,7 @@ export function Navbar({ className }: NavbarProps) {
                 </>
               ) : (
                 <Link to={ROUTES.login} onClick={closeMenu} className={mobilePrimaryAuthLinkClass}>
-                  Sign In
+                  <span className='text-black'>Sign In</span>
                 </Link>
               )}
             </div>
