@@ -207,4 +207,4 @@ Admin-only. Returns guide/category/user/bookmark/comment counts and recent audit
 ## Health
 
 ### `GET /health`
-Public health-check endpoint used by Render.
+Public health-check endpoint.

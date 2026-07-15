@@ -22,7 +22,7 @@
     "test": "pnpm -r test",
     "test:api": "pnpm --filter @gta6-guide/api test",
     "test:web": "pnpm --filter @gta6-guide/web test",
-    "vercel-build": "pnpm --filter @gta6-guide/web... build",
+    "vercel-build": "pnpm build",
     "start": "pnpm --filter @gta6-guide/api start"
   },
   "devDependencies": {

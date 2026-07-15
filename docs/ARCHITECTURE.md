@@ -74,7 +74,13 @@ Route pages are lazy-loaded to reduce initial bundle size. TanStack Query handle
 ## Deployment architecture
 
 ```text
-Browser -> Vercel static frontend -> Render API -> MongoDB Atlas
+Browser -> Vercel (static frontend + /api/* rewritten to a serverless function running the Express app) -> MongoDB Atlas
 ```
 
-CORS allows only configured frontend origins. The web app uses `VITE_API_BASE_URL` to call the Render API.
+Frontend and API are a single Vercel project on one domain. `vercel.json`
+rewrites `/api/*` requests to `api/index.js`, a serverless function that
+wraps the unmodified Express app (see `docs/DEPLOYMENT.md`). The web app
+uses `VITE_API_BASE_URL` (defaults to the relative path `/api/v1`) to call
+the API on the same origin, so most requests are same-origin and don't
+require CORS. CORS still validates the `Origin` header via `CLIENT_URL` /
+`CLIENT_URLS` for the requests where browsers do send one.

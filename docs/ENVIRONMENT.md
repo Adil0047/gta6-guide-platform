@@ -6,12 +6,12 @@
 | --- | --- |
 | `PROJECT_NAME` | Optional project display name for local tooling. |
 
-## API (`apps/api/.env` or Render)
+## API (`apps/api/.env` locally, or Vercel Project Settings in production)
 
 | Variable | Required | Description |
 | --- | --- | --- |
 | `NODE_ENV` | Yes | `development`, `test`, or `production`. |
-| `PORT` | Yes | API port. Render injects a port, but `10000` is fine for blueprint config. |
+| `PORT` | Yes locally | API port used by `server.listen()` in local dev / traditional Node hosting. Not used by the Vercel serverless function (`api/index.js`), which has no listening port. |
 | `CLIENT_URL` | Yes | Primary frontend origin allowed by CORS. |
 | `CLIENT_URLS` | No | Comma-separated extra frontend origins. Use for preview and custom domains. |
 | `API_BASE_URL` | Yes | API mount path, normally `/api/v1`. |
