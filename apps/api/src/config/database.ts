@@ -25,7 +25,26 @@ async function ensureDatabaseIndexes() {
   logger.info('MongoDB indexes ensured');
 }
 
-export async function connectDatabase() {
+// In serverless environments (e.g. Vercel) this module can be evaluated once
+// and then reused across many warm invocations of the same function
+// instance, but it can also be re-evaluated on cold starts. Caching the
+// connection promise on `globalThis` avoids opening a new MongoDB connection
+// (and re-running index creation) on every request while still working
+// correctly for the long-running server entrypoint used in local/dev and
+// traditional Node hosting.
+type DatabaseConnectionCache = {
+  promise: Promise<typeof mongoose> | null;
+};
+
+const globalForDatabase = globalThis as typeof globalThis & {
+  __gta6DatabaseConnection?: DatabaseConnectionCache;
+};
+
+const connectionCache: DatabaseConnectionCache = (globalForDatabase.__gta6DatabaseConnection ??= {
+  promise: null,
+});
+
+async function establishConnection() {
   mongoose.set('strictQuery', true);
   mongoose.set('bufferCommands', false);
 
@@ -47,10 +66,26 @@ export async function connectDatabase() {
       },
       'MongoDB connected',
     );
+
+    return mongoose;
   } catch (error) {
     logger.fatal({ err: error }, 'MongoDB connection failed. Check MONGODB_URI and database availability.');
     throw error;
   }
+}
+
+export async function connectDatabase() {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose;
+  }
+
+  connectionCache.promise ??= establishConnection().catch((error: unknown) => {
+    // Allow the next invocation to retry instead of caching a permanent failure.
+    connectionCache.promise = null;
+    throw error;
+  });
+
+  return connectionCache.promise;
 }
 
 export async function disconnectDatabase() {

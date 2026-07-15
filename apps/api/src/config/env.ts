@@ -83,7 +83,17 @@ const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
   console.error('Invalid environment configuration:', parsedEnv.error.flatten().fieldErrors);
-  process.exit(1);
+
+  // In a long-running process (local dev, traditional Node hosting) exiting
+  // immediately is the clearest signal of misconfiguration. In a serverless
+  // function invocation, calling process.exit() can kill the whole runtime
+  // in unexpected ways, so we throw instead and let the caller's error
+  // handling (or the platform) turn this into a failed invocation.
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
+
+  throw new Error('Invalid environment configuration. Check MONGODB_URI and other required variables.');
 }
 
 export const env = parsedEnv.data;
