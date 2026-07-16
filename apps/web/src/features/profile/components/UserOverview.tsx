@@ -77,7 +77,9 @@ function createActivityItems(dashboard: UserDashboard): ActivityItem[] {
     }));
 
   return [...bookmarkItems, ...commentItems, ...viewedItems]
-    .sort((first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime())
+    .sort(
+      (first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime(),
+    )
     .slice(0, 6);
 }
 
@@ -211,18 +213,23 @@ export function UserOverview() {
             )}
             <div>
               <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-2xl font-black tracking-tight text-white">Welcome back, {user.name}</h2>
+                <h2 className="text-2xl font-black tracking-tight text-white">
+                  Welcome back, {user.name}
+                </h2>
                 <Badge variant="cyan">{user.role}</Badge>
               </div>
               <p className="mt-2 text-sm leading-6 text-text-secondary">
                 @{user.username} · Joined {user.createdAt ? formatDate(user.createdAt) : 'recently'}
               </p>
-              {user.bio ? <p className="mt-2 text-sm leading-6 text-text-secondary">{user.bio}</p> : null}
+              {user.bio ? (
+                <p className="mt-2 text-sm leading-6 text-text-secondary">{user.bio}</p>
+              ) : null}
             </div>
           </div>
           {typeof stats.profileCompletion === 'number' ? (
             <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-text-secondary">
-              <span className="font-bold text-white">{stats.profileCompletion}%</span> profile complete
+              <span className="font-bold text-white">{stats.profileCompletion}%</span> profile
+              complete
             </div>
           ) : null}
         </div>
@@ -258,7 +265,9 @@ export function UserOverview() {
                       <p className="text-sm font-semibold text-white">{item.guide.title}</p>
                       <span className="text-xs text-text-muted">{formatDate(item.viewedAt)}</span>
                     </div>
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">{item.guide.excerpt}</p>
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">
+                      {item.guide.excerpt}
+                    </p>
                   </Link>
                 ) : null,
               )}
@@ -269,15 +278,21 @@ export function UserOverview() {
               title="No recently viewed guides"
               description="Start exploring guides while signed in and your continue-reading list will appear here."
               action={
-                <Link to={ROUTES.guides} className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-                  Start exploring guides
+                <Link
+                  to={ROUTES.guides}
+                  className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <span className="text-black group-hover:text-black">Start exploring guides</span>
                 </Link>
               }
             />
           )}
         </GuideListCard>
 
-        <GuideListCard title="Recent bookmarks" description="Your latest saved guides from the bookmark database.">
+        <GuideListCard
+          title="Recent bookmarks"
+          description="Your latest saved guides from the bookmark database."
+        >
           {dashboard.recentBookmarks.length > 0 ? (
             <div className="space-y-3">
               {dashboard.recentBookmarks.map((bookmark) =>
@@ -289,7 +304,9 @@ export function UserOverview() {
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-white">{bookmark.guide.title}</p>
-                      <span className="text-xs text-text-muted">{formatDate(bookmark.createdAt)}</span>
+                      <span className="text-xs text-text-muted">
+                        {formatDate(bookmark.createdAt)}
+                      </span>
                     </div>
                     <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">
                       {bookmark.guide.excerpt}
@@ -304,8 +321,11 @@ export function UserOverview() {
               title="No bookmarks yet"
               description="Save guides you want to revisit and they will show up here."
               action={
-                <Link to={ROUTES.guides} className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-                  Browse guides
+                <Link
+                  to={ROUTES.guides}
+                  className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <span className="text-black group-hover:text-black">Browse guides</span>
                 </Link>
               }
             />
@@ -314,7 +334,10 @@ export function UserOverview() {
       </div>
 
       <div className="mt-8 grid gap-5 xl:grid-cols-2">
-        <GuideListCard title="Recent comments" description="Newest comments and moderation states from your account.">
+        <GuideListCard
+          title="Recent comments"
+          description="Newest comments and moderation states from your account."
+        >
           {dashboard.recentComments.length > 0 ? (
             <div className="space-y-3">
               {dashboard.recentComments.map((comment) =>
@@ -330,7 +353,9 @@ export function UserOverview() {
                         {comment.status}
                       </Badge>
                     </div>
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">{comment.body}</p>
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">
+                      {comment.body}
+                    </p>
                   </Link>
                 ) : null,
               )}
@@ -341,15 +366,21 @@ export function UserOverview() {
               title="No comments yet"
               description="Join a guide discussion and your latest comments will appear here."
               action={
-                <Link to={ROUTES.guides} className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-                  Find a guide
+                <Link
+                  to={ROUTES.guides}
+                  className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <span className="text-black group-hover:text-black">Find a guide</span>
                 </Link>
               }
             />
           )}
         </GuideListCard>
 
-        <GuideListCard title="Activity" description="Bookmarks, comments, and viewed guides sorted newest first.">
+        <GuideListCard
+          title="Activity"
+          description="Bookmarks, comments, and viewed guides sorted newest first."
+        >
           {activity.length > 0 ? (
             <div className="space-y-3">
               {activity.map((item) => (
@@ -365,7 +396,9 @@ export function UserOverview() {
                     <span className="text-xs text-text-muted">{formatDate(item.createdAt)}</span>
                   </div>
                   <p className="mt-3 text-sm font-semibold text-white">{item.title}</p>
-                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">{item.description}</p>
+                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">
+                    {item.description}
+                  </p>
                 </Link>
               ))}
             </div>
@@ -403,8 +436,11 @@ export function UserOverview() {
               title="No recommendations yet"
               description="Explore and bookmark a few guides so recommendations can use your real activity."
               action={
-                <Link to={ROUTES.guides} className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-                  Explore guides
+                <Link
+                  to={ROUTES.guides}
+                  className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <span className="text-black group-hover:text-black">Explore guides</span>
                 </Link>
               }
             />

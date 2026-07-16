@@ -50,7 +50,7 @@ export function HeroSection() {
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link to={ROUTES.guides}>
                 <Button>
-                  Explore guides
+                  <span className="text-black">Explore guides</span>
                   <ArrowRight aria-hidden className="ml-2 size-4" />
                 </Button>
               </Link>

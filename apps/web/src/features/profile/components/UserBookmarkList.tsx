@@ -66,7 +66,10 @@ export function UserBookmarkList() {
           <div className="grid gap-5 xl:grid-cols-2">
             {bookmarks.map((bookmark) =>
               bookmark.guide ? (
-                <div key={bookmark.id} className="rounded-card border border-white/10 bg-white/[0.04] p-5">
+                <div
+                  key={bookmark.id}
+                  className="rounded-card border border-white/10 bg-white/[0.04] p-5"
+                >
                   <GuideCard
                     title={bookmark.guide.title}
                     slug={bookmark.guide.slug}
@@ -90,10 +93,18 @@ export function UserBookmarkList() {
                   </div>
                 </div>
               ) : (
-                <div key={bookmark.id} className="rounded-card border border-white/10 bg-white/[0.04] p-5">
-                  <p className="text-sm text-text-secondary">This saved guide is no longer available.</p>
-                  <Link className="mt-3 inline-block text-sm font-semibold text-neon-cyan" to="/guides">
-                    Browse guides
+                <div
+                  key={bookmark.id}
+                  className="rounded-card border border-white/10 bg-white/[0.04] p-5"
+                >
+                  <p className="text-sm text-text-secondary">
+                    This saved guide is no longer available.
+                  </p>
+                  <Link
+                    className="mt-3 inline-block text-sm font-semibold text-neon-cyan"
+                    to="/guides"
+                  >
+                    <span className="text-black">Browse guides</span>
                   </Link>
                 </div>
               ),
