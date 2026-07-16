@@ -36,7 +36,7 @@ export function setRefreshTokenCookie(response: Response, token: string) {
     httpOnly: true,
     secure: isProduction,
     sameSite: isProduction ? 'none' : 'lax',
-    signed: true,
+    // signed: true,
     path: refreshCookiePath,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
@@ -47,7 +47,7 @@ export function clearRefreshTokenCookie(response: Response) {
     httpOnly: true,
     secure: isProduction,
     sameSite: isProduction ? 'none' : 'lax',
-    signed: true,
+    // signed: true,
     path: refreshCookiePath,
   });
 }

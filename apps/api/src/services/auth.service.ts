@@ -217,8 +217,14 @@ export async function changePassword(userId: string, currentPassword: string, ne
   return serializeUser(user);
 }
 
-export function getRefreshTokenFromSignedCookies(signedCookies: Record<string, unknown>) {
-  const value = signedCookies[env.REFRESH_TOKEN_COOKIE_NAME];
+// export function getRefreshTokenFromSignedCookies(signedCookies: Record<string, unknown>) {
+//   const value = signedCookies[env.REFRESH_TOKEN_COOKIE_NAME];
+
+//   return typeof value === 'string' ? value : undefined;
+// }
+
+export function getRefreshTokenFromCookies(cookies: Record<string, unknown>) {
+  const value = cookies[env.REFRESH_TOKEN_COOKIE_NAME];
 
   return typeof value === 'string' ? value : undefined;
 }

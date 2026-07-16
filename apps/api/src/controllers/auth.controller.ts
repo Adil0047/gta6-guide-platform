@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import {
   changePassword,
-  getRefreshTokenFromSignedCookies,
+  getRefreshTokenFromCookies,
   loginUser,
   logoutUser,
   refreshAuth,
@@ -60,7 +60,7 @@ export const login = asyncHandler(async (request, response) => {
 });
 
 export const refresh = asyncHandler(async (request, response) => {
-  const refreshToken = getRefreshTokenFromSignedCookies(request.signedCookies);
+  const refreshToken = getRefreshTokenFromCookies(request.cookies);
 
   if (!refreshToken) {
     response.status(StatusCodes.UNAUTHORIZED).json({
@@ -87,7 +87,7 @@ export const refresh = asyncHandler(async (request, response) => {
 });
 
 export const logout = asyncHandler(async (request, response) => {
-  const refreshToken = getRefreshTokenFromSignedCookies(request.signedCookies);
+  const refreshToken = getRefreshTokenFromCookies(request.cookies);
 
   await logoutUser(refreshToken, request.ip);
 
