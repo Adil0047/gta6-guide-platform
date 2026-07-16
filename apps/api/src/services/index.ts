@@ -1,6 +1,6 @@
 export {
   changePassword,
-  getRefreshTokenFromSignedCookies,
+  getRefreshTokenFromCookies,
   loginUser,
   logoutUser,
   refreshAuth,
