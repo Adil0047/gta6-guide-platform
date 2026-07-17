@@ -48,13 +48,19 @@ export function AdminCommentModeration() {
     );
   }
 
+  // if (commentsQuery.isError) {
+  //   return (
+  //     <ErrorState
+  //       title="Could not load comments"
+  //       description="The comment moderation API did not return records successfully."
+  //     />
+  //   );
+  // }
+
   if (commentsQuery.isError) {
-    return (
-      <ErrorState
-        title="Could not load comments"
-        description="The comment moderation API did not return records successfully."
-      />
-    );
+    console.log(commentsQuery.error);
+
+    return <ErrorState title="Could not load comments" description={String(commentsQuery.error)} />;
   }
 
   if (comments.length === 0) {
@@ -82,7 +88,8 @@ export function AdminCommentModeration() {
                 </span>
               </div>
               <p className="mt-2 text-xs text-text-muted">
-                {comment.user?.name ?? comment.user?.username ?? 'Unknown user'} · {formatDate(comment.createdAt)}
+                {comment.user?.name ?? comment.user?.username ?? 'Unknown user'} ·{' '}
+                {formatDate(comment.createdAt)}
               </p>
               <p className="mt-4 text-sm leading-7 text-text-secondary">{comment.body}</p>
             </div>
@@ -92,9 +99,14 @@ export function AdminCommentModeration() {
                 variant="ghost"
                 className="h-9 px-3 text-xs"
                 onClick={() => {
-                  updateStatusMutation.mutate({ id: comment.id, status: COMMENT_STATUSES.APPROVED });
+                  updateStatusMutation.mutate({
+                    id: comment.id,
+                    status: COMMENT_STATUSES.APPROVED,
+                  });
                 }}
-                disabled={updateStatusMutation.isPending || comment.status === COMMENT_STATUSES.APPROVED}
+                disabled={
+                  updateStatusMutation.isPending || comment.status === COMMENT_STATUSES.APPROVED
+                }
               >
                 <CheckCircle2 aria-hidden className="mr-2 size-4" />
                 Approve
@@ -103,9 +115,14 @@ export function AdminCommentModeration() {
                 variant="ghost"
                 className="h-9 px-3 text-xs"
                 onClick={() => {
-                  updateStatusMutation.mutate({ id: comment.id, status: COMMENT_STATUSES.REJECTED });
+                  updateStatusMutation.mutate({
+                    id: comment.id,
+                    status: COMMENT_STATUSES.REJECTED,
+                  });
                 }}
-                disabled={updateStatusMutation.isPending || comment.status === COMMENT_STATUSES.REJECTED}
+                disabled={
+                  updateStatusMutation.isPending || comment.status === COMMENT_STATUSES.REJECTED
+                }
               >
                 <XCircle aria-hidden className="mr-2 size-4" />
                 Reject

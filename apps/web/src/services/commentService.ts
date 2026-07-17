@@ -20,8 +20,8 @@ type MongoCommentDto = Omit<
 > & {
   _id?: string;
   id?: string;
-  guideId: string | MongoGuideDto;
-  userId: string | PopulatedUser;
+  guideId: string | MongoGuideDto | null;
+  userId: string | PopulatedUser | null;
   parentId?: string | MongoCommentDto;
   createdAt?: string | Date;
   updatedAt?: string | Date;
@@ -77,8 +77,22 @@ function getDocumentId(document: { id?: string; _id?: string }) {
   return document.id ?? document._id ?? '';
 }
 
-function normalizeUser(user: string | PopulatedUser): CommentItem['user'] {
-  if (typeof user === 'string') {
+// function normalizeUser(user: string | PopulatedUser): CommentItem['user'] {
+//   if (typeof user === 'string') {
+//     return null;
+//   }
+
+//   return {
+//     id: getDocumentId(user),
+//     name: user.name,
+//     username: user.username,
+//     avatar: user.avatar,
+//     role: user.role,
+//   };
+// }
+
+function normalizeUser(user: string | PopulatedUser | null): CommentItem['user'] {
+  if (!user || typeof user === 'string') {
     return null;
   }
 
@@ -92,7 +106,10 @@ function normalizeUser(user: string | PopulatedUser): CommentItem['user'] {
 }
 
 function normalizeComment(comment: MongoCommentDto): CommentItem {
-  const guide = typeof comment.guideId === 'object' ? normalizeGuideSummary(comment.guideId) : null;
+  const guide =
+    comment.guideId && typeof comment.guideId === 'object'
+      ? normalizeGuideSummary(comment.guideId)
+      : null;
 
   return {
     id: getDocumentId(comment),
@@ -107,7 +124,10 @@ function normalizeComment(comment: MongoCommentDto): CommentItem {
 }
 
 export const commentService = {
-  async listGuideComments(guideId: string, params: Record<string, string | number | undefined> = {}): Promise<PaginatedResult<CommentItem>> {
+  async listGuideComments(
+    guideId: string,
+    params: Record<string, string | number | undefined> = {},
+  ): Promise<PaginatedResult<CommentItem>> {
     const response = await apiClient.getEnvelope<MongoCommentDto[], PaginationMeta>(
       `/comments/guide/${guideId}${createQueryString(params)}`,
     );
@@ -118,7 +138,9 @@ export const commentService = {
     };
   },
 
-  async listMyComments(params: Record<string, string | number | undefined> = {}): Promise<PaginatedResult<CommentItem>> {
+  async listMyComments(
+    params: Record<string, string | number | undefined> = {},
+  ): Promise<PaginatedResult<CommentItem>> {
     const response = await apiClient.getEnvelope<MongoCommentDto[], PaginationMeta>(
       `/comments/me${createQueryString(params)}`,
       getAuthOptions(),
@@ -130,7 +152,9 @@ export const commentService = {
     };
   },
 
-  async listComments(params: Record<string, string | number | undefined> = {}): Promise<PaginatedResult<CommentItem>> {
+  async listComments(
+    params: Record<string, string | number | undefined> = {},
+  ): Promise<PaginatedResult<CommentItem>> {
     const response = await apiClient.getEnvelope<MongoCommentDto[], PaginationMeta>(
       `/comments${createQueryString(params)}`,
       getAuthOptions(),
