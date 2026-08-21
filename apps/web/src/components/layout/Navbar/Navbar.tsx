@@ -67,8 +67,8 @@ export function Navbar({ className }: NavbarProps) {
       className={cn(
         'sticky top-0 z-50 w-full border-b transition duration-300',
         hasScrolled
-          ? 'border-white/10 bg-background/80 shadow-[0_18px_80px_rgba(0,0,0,0.42)] backdrop-blur-xl'
-          : 'border-transparent bg-background/60 backdrop-blur-md',
+          ? 'border-white/10 bg-white/[0.08] shadow-[0_18px_80px_rgba(0,0,0,0.18)] backdrop-blur-xl'
+          : 'border-white/[0.06] bg-white/[0.04] backdrop-blur-lg',
         className,
       )}
     >
@@ -104,12 +104,15 @@ export function Navbar({ className }: NavbarProps) {
                   Admin Dashboard
                 </Link>
               ) : null}
+
               <Link to={ROUTES.dashboard} className={desktopAuthLinkClass}>
                 Dashboard
               </Link>
+
               <Link to={ROUTES.dashboardSettings} className={desktopAuthLinkClass}>
                 Profile
               </Link>
+
               <button
                 type="button"
                 className={desktopPrimaryAuthLinkClass}
@@ -121,7 +124,7 @@ export function Navbar({ className }: NavbarProps) {
             </>
           ) : (
             <Link to={ROUTES.login} className={desktopPrimaryAuthLinkClass}>
-              <span className='text-black'>Sign In</span>
+              <span className="text-black">Sign In</span>
             </Link>
           )}
         </div>
@@ -153,7 +156,7 @@ export function Navbar({ className }: NavbarProps) {
             animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
             exit={shouldReduceMotion ? undefined : { opacity: 0, y: -12 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
-            className="border-t border-white/10 bg-background/95 px-4 pb-6 pt-3 backdrop-blur-xl lg:hidden"
+            className="border-t border-white/10 bg-black/30 px-4 pb-6 pt-3 backdrop-blur-xl lg:hidden"
           >
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-3">
               {NAVBAR_LINKS.map((link) => (
@@ -171,12 +174,19 @@ export function Navbar({ className }: NavbarProps) {
                       Admin Dashboard
                     </Link>
                   ) : null}
+
                   <Link to={ROUTES.dashboard} onClick={closeMenu} className={mobileAuthLinkClass}>
                     Dashboard
                   </Link>
-                  <Link to={ROUTES.dashboardSettings} onClick={closeMenu} className={mobileAuthLinkClass}>
+
+                  <Link
+                    to={ROUTES.dashboardSettings}
+                    onClick={closeMenu}
+                    className={mobileAuthLinkClass}
+                  >
                     Profile
                   </Link>
+
                   <button
                     type="button"
                     className={mobilePrimaryAuthLinkClass}
@@ -188,7 +198,7 @@ export function Navbar({ className }: NavbarProps) {
                 </>
               ) : (
                 <Link to={ROUTES.login} onClick={closeMenu} className={mobilePrimaryAuthLinkClass}>
-                  <span className='text-black'>Sign In</span>
+                  <span className="text-black">Sign In</span>
                 </Link>
               )}
             </div>

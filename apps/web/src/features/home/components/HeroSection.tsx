@@ -10,12 +10,33 @@ import { ROUTES } from '@/constants/routes';
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden py-20 sm:py-24 lg:py-32">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-neon-pink/10 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-24 h-[26rem] w-[26rem] rounded-full bg-neon-cyan/10 blur-3xl" />
+    <section className="relative isolate overflow-hidden py-20 sm:py-24 lg:py-32">
+      {/* Cinematic hero background */}
+      <div className="pointer-events-none absolute inset-0 -z-30">
+        <img
+          src="/images/hero-banner.jpg"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-center"
+        />
+      </div>
+
+      {/* Darkening layer — keeps text readable without killing the image */}
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-black/40" />
+
+      {/* Bottom fade into the page */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-gradient-to-t from-background via-background/70 to-transparent" />
+
+      {/* Subtle side vignette */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+
+      {/* Existing atmospheric glow */}
+      <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-neon-pink/10 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-24 -z-10 h-[26rem] w-[26rem] rounded-full bg-neon-cyan/10 blur-3xl" />
 
       <Container className="relative">
         <div className="mx-auto max-w-5xl text-center">
+          {/* Badge */}
           <FadeIn>
             <Badge variant="pink" className="mx-auto">
               <Sparkles aria-hidden className="mr-2 size-3.5" />
@@ -23,29 +44,34 @@ export function HeroSection() {
             </Badge>
           </FadeIn>
 
+          {/* Main heading */}
           <FadeIn delay={0.08}>
-            <h1 className="mt-8 text-balance text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Master every mission, map route, secret, and upgrade in{' '}
+            <h1 className="mt-7 text-balance text-5xl font-black tracking-tight text-white drop-shadow-2xl sm:text-6xl lg:text-7xl">
+              Everything you need to
+              <br />
               <span className="bg-gradient-to-r from-neon-pink via-white to-neon-cyan bg-clip-text text-transparent">
-                GTA VI
+                conquer GTA VI.
               </span>
-              .
             </h1>
           </FadeIn>
 
+          {/* Description */}
           <FadeIn delay={0.16}>
-            <p className="mx-auto mt-7 max-w-3xl text-pretty text-base leading-8 text-text-secondary sm:text-lg">
-              A fast, cinematic, SEO-ready guide platform built for walkthroughs, categories,
-              search, dashboards, bookmarks, map tools, and future AI-powered gameplay assistance.
+            <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-8 text-white/85 drop-shadow-lg sm:text-lg">
+              Missions, secrets, maps, money, routes, and everything in between.
+              <br className="hidden sm:block" />
+              Find what you need fast, learn the game, and get back to playing.
             </p>
           </FadeIn>
 
+          {/* Search */}
           <FadeIn delay={0.24}>
-            <div className="mx-auto mt-10 max-w-3xl rounded-panel border border-white/10 bg-white/[0.04] p-3 shadow-panel backdrop-blur-xl">
+            <div className="mx-auto mt-9 max-w-3xl rounded-panel border border-white/15 bg-black/30 p-3 shadow-panel backdrop-blur-md">
               <SearchForm />
             </div>
           </FadeIn>
 
+          {/* CTA buttons */}
           <FadeIn delay={0.32}>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link to={ROUTES.guides}>
@@ -54,9 +80,10 @@ export function HeroSection() {
                   <ArrowRight aria-hidden className="ml-2 size-4" />
                 </Button>
               </Link>
+
               <Link
                 to={ROUTES.map}
-                className="inline-flex h-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-5 text-sm font-semibold text-white transition hover:border-neon-cyan/40 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-white/15 bg-black/25 px-5 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-neon-cyan/40 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 View map system
               </Link>
@@ -64,22 +91,31 @@ export function HeroSection() {
           </FadeIn>
         </div>
 
+        {/* Feature cards */}
         <ScaleIn delay={0.42}>
           <div className="mx-auto mt-16 grid max-w-5xl gap-4 sm:grid-cols-3">
-            <div className="rounded-card border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+            <div className="rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md">
               <BookOpen aria-hidden className="size-6 text-neon-pink" />
+
               <p className="mt-4 text-2xl font-black text-white">80+</p>
-              <p className="mt-1 text-sm text-text-secondary">Guide-ready content modules</p>
+
+              <p className="mt-1 text-sm text-white/70">Guide-ready content modules</p>
             </div>
-            <div className="rounded-card border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+
+            <div className="rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md">
               <Search aria-hidden className="size-6 text-neon-cyan" />
+
               <p className="mt-4 text-2xl font-black text-white">Fast</p>
-              <p className="mt-1 text-sm text-text-secondary">Search-first discovery system</p>
+
+              <p className="mt-1 text-sm text-white/70">Search-first discovery system</p>
             </div>
-            <div className="rounded-card border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+
+            <div className="rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md">
               <Map aria-hidden className="size-6 text-neon-purple" />
+
               <p className="mt-4 text-2xl font-black text-white">Map</p>
-              <p className="mt-1 text-sm text-text-secondary">Interactive location architecture</p>
+
+              <p className="mt-1 text-sm text-white/70">Interactive location architecture</p>
             </div>
           </div>
         </ScaleIn>
