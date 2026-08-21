@@ -54,3 +54,6 @@ temp/
 *.tsbuildinfo
 node-compile-cache/
 
+
+.vercel
+.env*
