@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { StaggerGroup, StaggerItem } from '@/components/animations';
+import { StaggerGroup, StaggerItem, RevealOnScroll } from '@/components/animations';
 import { GuideCard } from '@/components/cards';
 import { EmptyState, ErrorState } from '@/components/feedback';
 import { Container } from '@/components/ui/Container';
@@ -19,7 +19,8 @@ export function FeaturedGuidesSection() {
   const featuredGuides = guidesQuery.data?.items ?? [];
 
   return (
-    <section className="py-16 sm:py-20">
+    <RevealOnScroll>
+      <section className="py-16 sm:py-20">
       <Container>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -98,7 +99,8 @@ export function FeaturedGuidesSection() {
           </div>
         ) : null}
       </Container>
-    </section>
+      </section>
+    </RevealOnScroll>
   );
 }
 

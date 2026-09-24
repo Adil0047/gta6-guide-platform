@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { StaggerGroup, StaggerItem } from '@/components/animations';
+import { StaggerGroup, StaggerItem, RevealOnScroll } from '@/components/animations';
 import { CategoryCard } from '@/components/cards';
 import { ErrorState } from '@/components/feedback';
 import { Container } from '@/components/ui/Container';
@@ -19,7 +19,8 @@ export function CategoryPreviewSection() {
   const categories = categoriesQuery.data?.items ?? [];
 
   return (
-    <section className="py-16 sm:py-20">
+    <RevealOnScroll>
+      <section className="py-16 sm:py-20">
       <Container>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -73,6 +74,7 @@ export function CategoryPreviewSection() {
           </StaggerGroup>
         ) : null}
       </Container>
-    </section>
+      </section>
+    </RevealOnScroll>
   );
 }

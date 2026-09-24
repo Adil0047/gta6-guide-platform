@@ -28,7 +28,7 @@ export function GuideCard({
   return (
     <Card
       className={cn(
-        'group relative overflow-hidden p-6 transition duration-300',
+        'shimmer-on-hover group relative overflow-hidden p-6 transition duration-300',
         'hover:-translate-y-1 hover:border-neon-cyan/40 hover:bg-white/[0.06] hover:shadow-[0_12px_40px_rgba(0,229,255,0.14)]',
         featured ? 'border-neon-pink/30' : '',
         className,
@@ -51,7 +51,7 @@ export function GuideCard({
         className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 ring-1 ring-inset ring-neon-cyan/20 transition-opacity duration-300 group-hover:opacity-100"
       />
       {featured ? (
-        <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full border border-neon-pink/30 bg-neon-pink/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-neon-pink shadow-[0_0_16px_rgba(255,60,172,0.3)]">
+        <span className="glow-pulse-pink absolute right-4 top-4 inline-flex items-center gap-1 rounded-full border border-neon-pink/30 bg-neon-pink/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-neon-pink">
           <Flame aria-hidden className="size-3" />
           Featured
         </span>

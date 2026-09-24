@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useState } from 'react';
 
 import { Container } from '@/components/ui/Container';
+import { RevealOnScroll } from '@/components/animations';
 import { faqs } from '@/data';
 import { cn } from '@/utils/cn';
 
@@ -11,7 +12,8 @@ export function FaqSection() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="py-16 sm:py-20">
+    <RevealOnScroll>
+      <section className="py-16 sm:py-20">
       <Container>
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-neon-cyan">FAQ</p>
@@ -88,6 +90,7 @@ export function FaqSection() {
           })}
         </div>
       </Container>
-    </section>
+      </section>
+    </RevealOnScroll>
   );
 }

@@ -100,6 +100,79 @@ body {
   animation: neon-pulse 3s ease-in-out infinite;
 }
 
+/* Ken Burns slow zoom — for the hero background image (cinematic, alive) */
+@keyframes ken-burns {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.08) translate(-1%, -1%); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+.ken-burns {
+  animation: ken-burns 24s ease-in-out infinite;
+}
+
+/* Animated gradient text — shifts hue for the hero H1 accent span */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animated-gradient-text {
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease-in-out infinite;
+}
+
+/* Floating motion — for decorative orbs/glows that should drift */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-18px); }
+}
+.float-slow {
+  animation: float 7s ease-in-out infinite;
+}
+.float-slower {
+  animation: float 11s ease-in-out infinite;
+}
+
+/* Glow pulse — pulsing box-shadow for badges/ribbons/accents */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(255, 60, 172, 0.25); }
+  50% { box-shadow: 0 0 28px rgba(255, 60, 172, 0.5); }
+}
+.glow-pulse-pink {
+  animation: glow-pulse 3.5s ease-in-out infinite;
+}
+@keyframes glow-pulse-cyan {
+  0%, 100% { box-shadow: 0 0 16px rgba(0, 229, 255, 0.2); }
+  50% { box-shadow: 0 0 28px rgba(0, 229, 255, 0.45); }
+}
+.glow-pulse-cyan {
+  animation: glow-pulse-cyan 4s ease-in-out infinite;
+}
+
+/* Shimmer — a light sweep across cards on hover (use with a ::before overlay) */
+@keyframes shimmer {
+  0% { transform: translateX(-150%) skewX(-20deg); }
+  100% { transform: translateX(250%) skewX(-20deg); }
+}
+.shimmer-on-hover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 70%
+  );
+  transform: translateX(-150%) skewX(-20deg);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.shimmer-on-hover:hover::after {
+  opacity: 1;
+  animation: shimmer 1.1s ease-out;
+}
+
 body[data-scroll-lock="true"] {
   overflow: hidden;
 }

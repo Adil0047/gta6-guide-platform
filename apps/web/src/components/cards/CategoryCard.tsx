@@ -17,7 +17,7 @@ export function CategoryCard({ title, slug, description, count, className }: Cat
   return (
     <Card
       className={cn(
-        'group relative overflow-hidden p-6 transition duration-300',
+        'shimmer-on-hover group relative overflow-hidden p-6 transition duration-300',
         'hover:-translate-y-1 hover:border-neon-pink/40 hover:bg-white/[0.06] hover:shadow-[0_12px_40px_rgba(255,60,172,0.14)]',
         className,
       )}
