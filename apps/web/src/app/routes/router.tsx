@@ -30,6 +30,12 @@ const AdminSettingsPage = lazy(() =>
 const AdminUsersPage = lazy(() =>
   import('@/pages/admin/AdminUsersPage').then((module) => ({ default: module.AdminUsersPage })),
 );
+const ForgotPasswordPage = lazy(() =>
+  import('@/pages/auth/ForgotPasswordPage').then((module) => ({ default: module.ForgotPasswordPage })),
+);
+const ResetPasswordPage = lazy(() =>
+  import('@/pages/auth/ResetPasswordPage').then((module) => ({ default: module.ResetPasswordPage })),
+);
 const CategoriesPage = lazy(() =>
   import('@/pages/public/CategoriesPage').then((module) => ({ default: module.CategoriesPage })),
 );
@@ -38,6 +44,9 @@ const CategoryDetailPage = lazy(() =>
 );
 const GuideDetailPage = lazy(() =>
   import('@/pages/public/GuideDetailPage').then((module) => ({ default: module.GuideDetailPage })),
+);
+const GuidePreviewMockPage = lazy(() =>
+  import('@/pages/public/GuidePreviewMockPage').then((module) => ({ default: module.GuidePreviewMockPage })),
 );
 const GuidesPage = lazy(() =>
   import('@/pages/public/GuidesPage').then((module) => ({ default: module.GuidesPage })),
@@ -85,6 +94,10 @@ export const router = createBrowserRouter([
         element: <GuidesPage />,
       },
       {
+        path: 'guides/preview-mock',
+        element: <GuidePreviewMockPage />,
+      },
+      {
         path: 'guides/:slug',
         element: <GuideDetailPage />,
       },
@@ -117,6 +130,14 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.register,
         element: <RegisterPage />,
+      },
+      {
+        path: ROUTES.forgotPassword,
+        element: <ForgotPasswordPage />,
+      },
+      {
+        path: ROUTES.resetPassword,
+        element: <ResetPasswordPage />,
       },
     ],
   },

@@ -29,9 +29,17 @@ export function SectionHeader({
       )}
     >
       <div className={cn(align === 'center' ? 'mx-auto' : '')}>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-neon-cyan">
-          {eyebrow}
-        </p>
+        <span
+          className={cn(
+            'inline-flex items-center gap-2.5',
+            align === 'center' ? 'justify-center' : '',
+          )}
+        >
+          <span aria-hidden className="h-px w-6 bg-gradient-to-r from-transparent to-neon-cyan/60" />
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-neon-cyan">
+            {eyebrow}
+          </p>
+        </span>
         <h2 className="mt-4 text-3xl font-black tracking-tight text-white sm:text-4xl">{title}</h2>
         {description ? (
           <p className="mt-4 max-w-2xl text-sm leading-7 text-text-secondary">{description}</p>

@@ -19,6 +19,14 @@ export type GuideFaq = {
   answer: string;
 };
 
+export type GuideSeo = {
+  metaTitle?: string;
+  metaDescription?: string;
+  canonicalUrl?: string;
+  keywords?: string[];
+  ogImage?: string;
+};
+
 export type Guide = {
   id: string;
   title: string;
@@ -43,6 +51,7 @@ export type Guide = {
   sections: GuideSection[];
   faqs: GuideFaq[];
   relatedSlugs: string[];
+  seo?: GuideSeo;
 };
 
 export type Category = {

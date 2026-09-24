@@ -7,7 +7,11 @@ import { AuthCard, RegisterForm } from '@/features/auth';
 export function RegisterPage() {
   return (
     <>
-      <SEO title="Create Account" description="Create a GTA VI Guide Platform account." />
+      <SEO
+        title="Create Account"
+        description="Create a GTA VI Guide Platform account."
+        noIndex
+      />
       <AuthCard
         eyebrow="Create account"
         title="Join the platform"

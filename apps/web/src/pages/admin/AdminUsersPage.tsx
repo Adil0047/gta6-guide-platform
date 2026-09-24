@@ -57,7 +57,7 @@ export function AdminUsersPage() {
 
   return (
     <>
-      <SEO title="Admin Users" description="Manage GTA VI Guide Platform users." />
+      <SEO title="Admin Users" description="Manage GTA VI Guide Platform users." noIndex />
       <main id="main-content" className="py-10 sm:py-12">
         <Container>
           <AdminPageHeader

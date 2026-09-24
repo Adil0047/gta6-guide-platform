@@ -1,6 +1,9 @@
-import { Github, Mail, Map, Search, ShieldCheck } from 'lucide-react';
+import { Github, Info, Mail, Map, Search, ShieldCheck } from 'lucide-react';
+import { Cookie } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
+import { CookiePreferencesDialog } from '@/components/common';
 import { Container } from '@/components/ui/Container';
 import { ROUTES } from '@/constants/routes';
 import { SITE_CONFIG } from '@/constants/site';
@@ -11,23 +14,24 @@ const footerLinks = [
     links: [
       { label: 'Guides', href: ROUTES.guides },
       { label: 'Categories', href: ROUTES.categories },
-      { label: 'Search', href: ROUTES.search },
       { label: 'Map', href: ROUTES.map },
+      { label: 'Search', href: ROUTES.search },
     ],
   },
   {
     title: 'Product',
     links: [
-      { label: 'Dashboard', href: ROUTES.dashboard },
-      { label: 'Admin', href: ROUTES.admin },
       { label: 'Sign In', href: ROUTES.login },
     ],
   },
 ];
 
 export function Footer() {
+  const [cookiePrefsOpen, setCookiePrefsOpen] = useState(false);
+
   return (
-    <footer className="border-t border-white/10 bg-background/90 py-14 text-text-secondary">
+    <footer className="mt-auto border-t border-white/10 bg-background/90 py-14 text-text-secondary">
+      <CookiePreferencesDialog open={cookiePrefsOpen} onClose={() => setCookiePrefsOpen(false)} />
       <Container>
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
           <div>
@@ -88,9 +92,32 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 text-xs text-text-muted sm:flex-row sm:items-center sm:justify-between">
+        <aside
+          role="note"
+          className="mt-10 flex items-start gap-3 rounded-2xl border border-neon-pink/15 bg-neon-pink/[0.05] px-5 py-4 text-xs leading-6 text-text-secondary"
+        >
+          <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-neon-pink/30 bg-neon-pink/10 text-neon-pink">
+            <Info aria-hidden className="size-3" />
+          </span>
+          <p>
+            <span className="font-semibold text-white">Unofficial fan site.</span>{' '}
+            Not affiliated with, endorsed by, or sponsored by Rockstar Games or Take-Two Interactive.
+            All trademarks belong to their respective owners. GTA VI is a trademark of Take-Two
+            Interactive Software, Inc.
+          </p>
+        </aside>
+
+        <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 text-xs text-text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 {SITE_CONFIG.name}. Built as a premium GTA VI guide product.</p>
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => setCookiePrefsOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <Cookie aria-hidden className="size-4" />
+              Cookie preferences
+            </button>
             <a
               href="mailto:team@gta6guide.local"
               className="inline-flex items-center gap-2 rounded-full transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"

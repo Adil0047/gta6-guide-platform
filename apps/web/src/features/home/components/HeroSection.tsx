@@ -94,29 +94,50 @@ export function HeroSection() {
         {/* Feature cards */}
         <ScaleIn delay={0.42}>
           <div className="mx-auto mt-16 grid max-w-5xl gap-4 sm:grid-cols-3">
-            <div className="rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md">
-              <BookOpen aria-hidden className="size-6 text-neon-pink" />
-
+            <Link
+              to={ROUTES.guides}
+              className="group rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md transition hover:border-neon-pink/40 hover:bg-white/[0.06]"
+            >
+              <span className="grid size-11 place-items-center rounded-2xl border border-neon-pink/20 bg-neon-pink/10 text-neon-pink">
+                <BookOpen aria-hidden className="size-6" />
+              </span>
               <p className="mt-4 text-2xl font-black text-white">80+</p>
-
               <p className="mt-1 text-sm text-white/70">Guide-ready content modules</p>
-            </div>
+              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-neon-pink opacity-0 transition group-hover:opacity-100">
+                Browse guides
+                <ArrowRight aria-hidden className="size-3" />
+              </span>
+            </Link>
 
-            <div className="rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md">
-              <Search aria-hidden className="size-6 text-neon-cyan" />
-
+            <Link
+              to={ROUTES.search}
+              className="group rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md transition hover:border-neon-cyan/40 hover:bg-white/[0.06]"
+            >
+              <span className="grid size-11 place-items-center rounded-2xl border border-neon-cyan/20 bg-neon-cyan/10 text-neon-cyan">
+                <Search aria-hidden className="size-6" />
+              </span>
               <p className="mt-4 text-2xl font-black text-white">Fast</p>
-
               <p className="mt-1 text-sm text-white/70">Search-first discovery system</p>
-            </div>
+              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-neon-cyan opacity-0 transition group-hover:opacity-100">
+                Start searching
+                <ArrowRight aria-hidden className="size-3" />
+              </span>
+            </Link>
 
-            <div className="rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md">
-              <Map aria-hidden className="size-6 text-neon-purple" />
-
+            <Link
+              to={ROUTES.map}
+              className="group rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md transition hover:border-neon-purple/40 hover:bg-white/[0.06]"
+            >
+              <span className="grid size-11 place-items-center rounded-2xl border border-neon-purple/20 bg-neon-purple/10 text-neon-purple">
+                <Map aria-hidden className="size-6" />
+              </span>
               <p className="mt-4 text-2xl font-black text-white">Map</p>
-
               <p className="mt-1 text-sm text-white/70">Interactive location architecture</p>
-            </div>
+              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-neon-purple opacity-0 transition group-hover:opacity-100">
+                Open map
+                <ArrowRight aria-hidden className="size-3" />
+              </span>
+            </Link>
           </div>
         </ScaleIn>
       </Container>

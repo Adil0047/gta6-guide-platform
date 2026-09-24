@@ -99,7 +99,7 @@ export function AdminCategoriesPage() {
 
   return (
     <>
-      <SEO title="Admin Categories" description="Manage GTA VI guide categories." />
+      <SEO title="Admin Categories" description="Manage GTA VI guide categories." noIndex />
       <main id="main-content" className="py-10 sm:py-12">
         <Container>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">

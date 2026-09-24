@@ -4,9 +4,11 @@ import { SkipLink } from '@/components/navigation';
 
 export function AuthLayout() {
   return (
-    <div className="min-h-screen bg-background text-text-primary">
+    <div className="flex min-h-screen flex-col bg-background text-text-primary">
       <SkipLink />
-      <Outlet />
+      <main className="flex-1">
+        <Outlet />
+      </main>
     </div>
   );
 }

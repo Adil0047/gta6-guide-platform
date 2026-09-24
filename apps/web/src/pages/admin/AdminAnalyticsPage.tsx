@@ -17,7 +17,7 @@ export function AdminAnalyticsPage() {
 
   return (
     <>
-      <SEO title="Admin Analytics" description="View GTA VI Guide Platform analytics." />
+      <SEO title="Admin Analytics" description="View GTA VI Guide Platform analytics." noIndex />
       <main id="main-content" className="py-10 sm:py-12">
         <Container>
           <AdminPageHeader

@@ -7,7 +7,11 @@ import { AuthCard, ForgotPasswordForm } from '@/features/auth';
 export function ForgotPasswordPage() {
   return (
     <>
-      <SEO title="Forgot Password" description="Request a GTA VI Guide Platform password reset." />
+      <SEO
+        title="Forgot Password"
+        description="Request a GTA VI Guide Platform password reset."
+        noIndex
+      />
       <AuthCard
         eyebrow="Password reset"
         title="Recover access"

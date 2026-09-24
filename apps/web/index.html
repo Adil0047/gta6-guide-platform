@@ -1,15 +1,14 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-TD8VDDK5P2"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-TD8VDDK5P2');
-</script>
+    <!--
+      Google Analytics (gtag) is intentionally NOT loaded here. It is injected
+      client-side by <GoogleAnalytics /> (src/components/common/GoogleAnalytics.tsx)
+      ONLY after the user accepts optional cookies via the consent banner
+      (src/components/common/CookieConsentBanner.tsx). This keeps the site
+      GDPR-compliant: analytics scripts do not run until explicit consent.
+      The Google tag ID lives in VITE_GA_ID (or a fallback default).
+    -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
@@ -22,6 +21,10 @@
       name="keywords"
       content="GTA VI guide, GTA 6 guide, GTA VI map, GTA VI missions, GTA VI vehicles, GTA VI characters, GTA VI secrets"
     />
+    <meta name="author" content="GTA VI Guide Platform" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="/images/favicon.png" />
+    <link rel="apple-touch-icon" href="/images/favicon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="GTA VI Guide Platform" />
     <meta property="og:title" content="GTA VI Guide Platform" />
@@ -29,20 +32,34 @@
       property="og:description"
       content="A premium GTA VI guide platform for missions, characters, vehicles, locations, secrets, tips, and interactive map discovery."
     />
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image:width" content="1344" />
+    <meta property="og:image:height" content="768" />
+    <meta property="og:image:alt" content="GTA VI Guide Platform — premium unofficial fan guide banner with Vice City neon aesthetic." />
+    <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="GTA VI Guide Platform" />
     <meta
       name="twitter:description"
       content="A premium GTA VI guide platform for missions, characters, vehicles, locations, secrets, tips, and interactive map discovery."
     />
-    <meta name="twitter:image" content="/og-image.png" />
-    <link rel="icon" type="image/png" href="/images/favicon.png" />
-    <link rel="canonical" href="/" />
+    <meta name="twitter:image" content="/og-image.jpg" />
+    <meta name="twitter:image:alt" content="GTA VI Guide Platform — premium unofficial fan guide banner." />
+    <!--
+      Per-page canonical, OG url, title, description, and JSON-LD are injected at runtime
+      by the <SEO /> component (src/components/common/SEO.tsx) to avoid shipping an
+      incorrect site-wide canonical for this client-rendered SPA.
+    -->
     <title>GTA VI Guide Platform</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run GTA VI Guide Platform.</noscript>
+    <noscript>
+      <div style="max-width:42rem;margin:4rem auto;padding:2rem;font-family:system-ui,sans-serif;color:#e5e7eb;background:#0a0a0f;border:1px solid rgba(255,255,255,0.1);border-radius:1rem;line-height:1.7;">
+        <h1 style="margin:0 0 1rem;font-size:1.5rem;color:#fff;">GTA VI Guide Platform</h1>
+        <p style="margin:0 0 1rem;">A premium unofficial fan guide for GTA VI — missions, map locations, vehicles, characters, secrets, tips, and interactive map discovery.</p>
+        <p style="margin:0;">JavaScript is required to explore the full interactive guide. You can still browse our content by enabling JavaScript in your browser.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

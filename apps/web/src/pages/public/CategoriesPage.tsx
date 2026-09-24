@@ -8,6 +8,7 @@ export function CategoriesPage() {
       <SEO
         title="GTA VI Categories"
         description="Browse GTA VI guides by missions, map locations, vehicles, characters, weapons, money, secrets, and online content."
+        canonicalUrl="/categories"
       />
       <main id="main-content" className="py-14 sm:py-20">
         <Container>

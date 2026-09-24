@@ -31,7 +31,8 @@ test('public home page renders critical hero copy', async () => {
   const { HomePage } = await import('../src/pages/public/HomePage.js');
   const html = renderWithProviders(<HomePage />);
 
-  assert.match(html, /Master every mission/);
+  assert.match(html, /Everything you need to/);
+  assert.match(html, /conquer GTA VI/);
   assert.match(html, /Explore guides/);
 });
 

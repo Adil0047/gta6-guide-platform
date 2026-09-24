@@ -5,7 +5,7 @@ import { AdminCommentModeration, AdminPageHeader } from '@/features/admin';
 export function AdminCommentsPage() {
   return (
     <>
-      <SEO title="Admin Comments" description="Moderate GTA VI Guide Platform comments." />
+      <SEO title="Admin Comments" description="Moderate GTA VI Guide Platform comments." noIndex />
       <main id="main-content" className="py-10 sm:py-12">
         <Container>
           <AdminPageHeader

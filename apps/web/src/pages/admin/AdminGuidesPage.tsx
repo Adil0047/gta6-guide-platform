@@ -161,7 +161,7 @@ export function AdminGuidesPage() {
 
   return (
     <>
-      <SEO title="Admin Guides" description="Manage GTA VI guide content." />
+      <SEO title="Admin Guides" description="Manage GTA VI guide content." noIndex />
       <main id="main-content" className="py-10 sm:py-12">
         <Container>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">

@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { StaggerGroup, StaggerItem } from '@/components/animations';
 import { GuideCard } from '@/components/cards';
-import { ErrorState } from '@/components/feedback';
+import { EmptyState, ErrorState } from '@/components/feedback';
 import { Container } from '@/components/ui/Container';
 import { Spinner } from '@/components/ui/Spinner';
 import { ROUTES } from '@/constants/routes';
@@ -72,12 +72,33 @@ export function FeaturedGuidesSection() {
                   excerpt={guide.excerpt}
                   category={guide.categoryLabel}
                   readTime={guide.readTime}
+                  featured={guide.featured}
                 />
               </StaggerItem>
             ))}
           </StaggerGroup>
         ) : null}
+
+        {!guidesQuery.isLoading && !guidesQuery.isError && featuredGuides.length === 0 ? (
+          <div className="mt-10">
+            <EmptyState
+              icon={<BookOpen aria-hidden className="size-7" />}
+              title="Featured guides coming soon"
+              description="The backend guide index is not populated yet. Explore the full guide library or browse by category in the meantime."
+              action={
+                <Link
+                  to={ROUTES.guides}
+                  className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black transition hover:bg-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  Explore the guide library
+                  <ArrowRight aria-hidden className="size-4" />
+                </Link>
+              }
+            />
+          </div>
+        ) : null}
       </Container>
     </section>
   );
 }
+

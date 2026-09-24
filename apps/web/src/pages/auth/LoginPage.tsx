@@ -7,7 +7,11 @@ import { AuthCard, LoginForm } from '@/features/auth';
 export function LoginPage() {
   return (
     <>
-      <SEO title="Sign In" description="Sign in to your GTA VI Guide Platform account." />
+      <SEO
+        title="Sign In"
+        description="Sign in to your GTA VI Guide Platform account."
+        noIndex
+      />
       <AuthCard
         eyebrow="Account"
         title="Sign in"

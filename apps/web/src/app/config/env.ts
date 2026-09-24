@@ -13,7 +13,11 @@ const DEFAULT_APP_ENV: AppEnv['appEnv'] = 'production';
 const DEFAULT_API_BASE_URL = '/api/v1';
 
 function getEnvSource(): EnvSource {
-  return import.meta.env as EnvSource;
+  // In Vite (dev + build) import.meta.env is injected by the bundler. In
+  // non-Vite runtimes (e.g. raw `tsx` unit tests) it is undefined, so fall
+  // back to an empty object — callers then use the DEFAULT_* constants
+  // below. This is a defensive guard; it does not change Vite behavior.
+  return (import.meta as { env?: EnvSource }).env ?? {};
 }
 
 function readEnvValue(key: ViteAppEnvKey) {
@@ -35,7 +39,8 @@ function normalizeAppEnv(value: string | undefined): AppEnv['appEnv'] {
     return value;
   }
 
-  return import.meta.env.DEV ? 'development' : DEFAULT_APP_ENV;
+  const isDev = (import.meta as { env?: { DEV?: boolean } }).env?.DEV;
+  return isDev ? 'development' : DEFAULT_APP_ENV;
 }
 
 function normalizeUrl(value: string | undefined, fallback: string) {

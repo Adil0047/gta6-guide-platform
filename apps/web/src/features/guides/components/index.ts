@@ -4,3 +4,4 @@ export { GuideFilterPanel } from './GuideFilterPanel';
 export type { GuideFilterState } from './GuideFilterPanel';
 export { GuideListing } from './GuideListing';
 export { GuideTableOfContents } from './GuideTableOfContents';
+export { SectionHeading } from './SectionHeading';

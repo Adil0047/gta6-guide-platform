@@ -26,7 +26,7 @@ export function AdminDashboardPage() {
 
   return (
     <>
-      <SEO title="Admin Dashboard" description="Admin overview for GTA VI Guide Platform." />
+      <SEO title="Admin Dashboard" description="Admin overview for GTA VI Guide Platform." noIndex />
       <main id="main-content" className="py-10 sm:py-12">
         <Container>
           <AdminPageHeader

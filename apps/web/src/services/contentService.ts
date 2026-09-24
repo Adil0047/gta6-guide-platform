@@ -22,6 +22,7 @@ import { type PaginationMeta } from '@gta6-guide/shared/pagination';
 import { createSlug } from '@gta6-guide/shared/slug';
 
 import { apiClient } from '@/lib/apiClient';
+import { ROUTES } from '@/constants/routes';
 import { type Category, type Guide } from '@/types/content';
 import { type NavigationIcon } from '@/types/navigation';
 
@@ -245,6 +246,7 @@ export function normalizeGuide(guide: MongoGuideDto): Guide {
     sections: normalizeSections(guide),
     faqs: guide.faqs,
     relatedSlugs: [],
+    seo: guide.seo,
   };
 }
 
@@ -257,10 +259,30 @@ export function normalizeGuideSummary(guide: MongoGuideDto): GuideSummaryDto {
   };
 }
 
+/**
+ * Resolves the effective SEO values for a guide, preferring the editorial
+ * `guide.seo` subdocument (set via the admin form) and falling back to the
+ * guide's own title/excerpt/tags when an editorial field is empty.
+ *
+ * Returns absolute-ish values where relevant (canonicalUrl stays relative
+ * to the site root; the <SEO /> component resolves it to absolute via
+ * SITE_CONFIG.url). ogImage is passed through as-is (the <SEO /> component
+ * resolves it).
+ */
 export function getGuideSeo(guide: Guide) {
+  const seo = guide.seo ?? {};
+  const metaTitle = seo.metaTitle?.trim() || guide.title;
+  const metaDescription = seo.metaDescription?.trim() || guide.excerpt;
+  const canonicalUrl = seo.canonicalUrl?.trim() || `${ROUTES.guides}/${guide.slug}`;
+  const keywords = seo.keywords && seo.keywords.length > 0 ? seo.keywords : guide.tags;
+  const ogImage = seo.ogImage?.trim() || undefined;
+
   return {
-    title: guide.title,
-    description: guide.excerpt,
+    title: metaTitle,
+    description: metaDescription,
+    canonicalUrl,
+    keywords,
+    image: ogImage,
   };
 }
 

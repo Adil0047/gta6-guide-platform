@@ -1,0 +1,42 @@
+{
+  "_comment": "Single source of truth for SEO route config. Imported by apps/web/scripts/generate-seo-files.mjs (build-time Node) AND apps/web/src/features/admin/components/AdminSeoPanel.tsx (client). Do NOT add runtime-only values here — keep it to pure data so it is safe to import from both Node and the browser bundle via Vite's ?json import.",
+  "siteName": "GTA VI Guide Platform",
+  "indexableRoutes": [
+    { "path": "/", "changefreq": "daily", "priority": "1.0" },
+    { "path": "/guides", "changefreq": "daily", "priority": "0.9" },
+    { "path": "/categories", "changefreq": "weekly", "priority": "0.8" },
+    { "path": "/map", "changefreq": "weekly", "priority": "0.7" }
+  ],
+  "disallowedPaths": [
+    "/admin",
+    "/dashboard",
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/search",
+    "/api",
+    "/guides/preview-mock"
+  ],
+  "noindexRoutes": [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/dashboard",
+    "/dashboard/*",
+    "/admin",
+    "/admin/*",
+    "/search",
+    "404 catch-all"
+  ],
+  "structuredDataTypes": [
+    { "type": "Organization", "location": "Homepage" },
+    { "type": "WebSite", "location": "Homepage + default fallback" },
+    { "type": "FAQPage", "location": "Homepage + guide detail (when guide.faqs)" },
+    { "type": "Article", "location": "Guide detail" },
+    { "type": "BreadcrumbList", "location": "Guide detail + category detail (via Breadcrumbs)" },
+    { "type": "CollectionPage", "location": "Category detail + map" },
+    { "type": "ItemList (Place)", "location": "Map" }
+  ]
+}

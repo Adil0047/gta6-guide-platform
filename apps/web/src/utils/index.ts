@@ -1,6 +1,6 @@
 export { cn } from './cn';
 export { createPageTitle } from './createPageTitle';
-export { formatDate } from './formatDate';
+export { formatDate, formatRelativeDate } from './formatDate';
 export {
   getFeaturedGuides,
   getGuideBySlug,

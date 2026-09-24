@@ -27,9 +27,13 @@ export function LatestUpdatesSection() {
               {platformUpdates.map((update) => (
                 <article
                   key={update.id}
-                  className="rounded-card border border-white/10 bg-background/40 p-5"
+                  className="group relative overflow-hidden rounded-card border border-white/10 bg-background/40 p-5 transition hover:border-neon-cyan/30 hover:bg-white/[0.04]"
                 >
-                  <div className="flex flex-wrap items-center gap-3">
+                  <span
+                    aria-hidden
+                    className="absolute inset-y-0 left-0 w-0.5 bg-gradient-to-b from-neon-cyan/40 via-neon-pink/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
+                  <div className="flex flex-wrap items-center gap-3 pl-1.5">
                     <span className="inline-flex items-center gap-2 rounded-full border border-neon-cyan/20 bg-neon-cyan/10 px-3 py-1 text-xs font-semibold text-neon-cyan">
                       {update.category}
                     </span>
@@ -38,10 +42,12 @@ export function LatestUpdatesSection() {
                       {formatDate(update.date)}
                     </span>
                   </div>
-                  <h3 className="mt-4 text-xl font-black tracking-tight text-white">
+                  <h3 className="mt-4 pl-1.5 text-xl font-black tracking-tight text-white">
                     {update.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-7 text-text-secondary">{update.description}</p>
+                  <p className="mt-2 pl-1.5 text-sm leading-7 text-text-secondary">
+                    {update.description}
+                  </p>
                 </article>
               ))}
             </div>

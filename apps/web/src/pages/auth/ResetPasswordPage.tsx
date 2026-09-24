@@ -7,7 +7,11 @@ import { AuthCard, ResetPasswordForm } from '@/features/auth';
 export function ResetPasswordPage() {
   return (
     <>
-      <SEO title="Reset Password" description="Reset your GTA VI Guide Platform password." />
+      <SEO
+        title="Reset Password"
+        description="Reset your GTA VI Guide Platform password."
+        noIndex
+      />
       <AuthCard
         eyebrow="Secure reset"
         title="Choose a new password"

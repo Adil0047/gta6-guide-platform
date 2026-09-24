@@ -11,12 +11,25 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { bookmarkService, commentService, queryKeys } from '@/services';
 import { type Guide } from '@/types/content';
 import { formatDate } from '@/utils/formatDate';
+import { useRelativeTime } from '@/hooks';
 import { GuideTableOfContents } from './GuideTableOfContents';
+import { SectionHeading } from './SectionHeading';
 
 type GuideArticleProps = {
   guide: Guide;
   allGuides: Guide[];
 };
+
+// Wrapper so useRelativeTime (a hook) can be used inside .map() without
+// violating the rules of hooks.
+function CommentDate({ createdAt }: { createdAt: string }) {
+  const relative = useRelativeTime(createdAt);
+  return (
+    <p className="mt-1 text-xs text-text-muted" title={formatDate(createdAt)}>
+      {relative}
+    </p>
+  );
+}
 
 export function GuideArticle({ guide, allGuides }: GuideArticleProps) {
   const [commentBody, setCommentBody] = useState('');
@@ -82,7 +95,7 @@ export function GuideArticle({ guide, allGuides }: GuideArticleProps) {
             <div className="mt-8 space-y-12">
               {guide.sections.map((section) => (
                 <section key={section.id} id={section.id} className="scroll-mt-28">
-                  <h2 className="text-3xl font-black tracking-tight text-white">{section.title}</h2>
+                  <SectionHeading id={section.id}>{section.title}</SectionHeading>
                   <div className="mt-5 space-y-5">
                     {section.body.map((paragraph) => (
                       <p key={paragraph} className="text-base leading-8 text-text-secondary">
@@ -218,7 +231,7 @@ export function GuideArticle({ guide, allGuides }: GuideArticleProps) {
                       <p className="text-sm font-semibold text-white">
                         {comment.user?.name ?? comment.user?.username ?? 'Community member'}
                       </p>
-                      <p className="mt-1 text-xs text-text-muted">{formatDate(comment.createdAt)}</p>
+                      <CommentDate createdAt={String(comment.createdAt)} />
                     </div>
                     {comment.isEdited ? (
                       <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-text-muted">

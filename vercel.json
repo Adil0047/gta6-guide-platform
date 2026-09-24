@@ -46,8 +46,8 @@
       "destination": "/api"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/((?!assets/|images/|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|og-image\\.jpg|favicon).*)",
+      "destination": "/api/seo"
     }
   ],
   "framework": "vite"

@@ -1,4 +1,13 @@
 User-agent: *
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /search
+Disallow: /api
+Disallow: /guides/preview-mock
 Allow: /
 
 Sitemap: http://localhost:5173/sitemap.xml

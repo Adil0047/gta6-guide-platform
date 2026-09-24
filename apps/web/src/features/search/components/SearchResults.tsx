@@ -26,7 +26,7 @@ export function SearchResults() {
   return (
     <div>
       <div className="rounded-panel border border-white/10 bg-white/[0.04] p-4 shadow-panel backdrop-blur-xl">
-        <SearchForm initialValue={query} />
+        <SearchForm initialValue={query} focusOnMount />
       </div>
 
       <div className="mt-8">

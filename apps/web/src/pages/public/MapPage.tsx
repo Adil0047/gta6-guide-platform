@@ -1,13 +1,57 @@
 import { SEO } from '@/components/common';
 import { Container } from '@/components/ui/Container';
+import { mapLocations } from '@/data';
 import { MapExperience } from '@/features/map';
+import { ROUTES } from '@/constants/routes';
+import { SITE_CONFIG } from '@/constants/site';
 
 export function MapPage() {
+  const structuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: 'Interactive GTA VI Map',
+      description:
+        'Explore a frontend-ready GTA VI map interface with district markers, marker cards, filters, and future saved locations.',
+      inLanguage: 'en-US',
+      url: `${SITE_CONFIG.url}${ROUTES.map}`,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: SITE_CONFIG.name,
+        url: SITE_CONFIG.url,
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'GTA VI map locations',
+      itemListOrder: 'https://schema.org/ItemListOrderAscending',
+      numberOfItems: mapLocations.length,
+      itemListElement: mapLocations.map((location, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'Place',
+          name: location.name,
+          description: location.description,
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: location.district,
+            addressRegion: 'Vice City',
+          },
+          additionalType: 'https://schema.org/Place',
+        },
+      })),
+    },
+  ];
+
   return (
     <>
       <SEO
         title="Interactive GTA VI Map"
         description="Explore a frontend-ready GTA VI map interface with district markers, marker cards, filters, and future saved locations."
+        canonicalUrl={ROUTES.map}
+        structuredData={structuredData}
       />
       <main id="main-content" className="py-14 sm:py-20">
         <Container>

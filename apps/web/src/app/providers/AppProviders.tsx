@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { RouterProvider } from 'react-router';
 
 import { router } from '@/app/routes/router';
-import { LoadingScreen } from '@/components/common';
+import { CookieConsentBanner, GoogleAnalytics, LoadingScreen } from '@/components/common';
 import { ROUTES } from '@/constants/routes';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import { setSessionExpiredHandler } from '@/lib/apiClient';
@@ -57,6 +57,8 @@ export function AppProviders() {
         <Suspense fallback={<LoadingScreen />}>
           <RouterProvider router={router} />
         </Suspense>
+        <CookieConsentBanner />
+        <GoogleAnalytics />
       </AuthProvider>
     </QueryClientProvider>
   );

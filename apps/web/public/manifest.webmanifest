@@ -1,0 +1,26 @@
+{
+  "name": "GTA VI Guide Platform",
+  "short_name": "GTA VI Guide",
+  "description": "A premium unofficial GTA VI fan guide platform for missions, map locations, vehicles, characters, secrets, tips, and interactive map discovery.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#000000",
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/images/favicon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["games", "entertainment", "guides"]
+}

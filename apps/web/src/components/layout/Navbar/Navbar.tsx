@@ -87,11 +87,26 @@ export function Navbar({ className }: NavbarProps) {
         <div className="hidden items-center gap-3 lg:flex">
           <Link
             to={ROUTES.search}
-            aria-label="Open search"
-            className="inline-flex size-11 items-center justify-center rounded-full bg-white/[0.05] text-text-secondary ring-1 ring-white/10 transition hover:bg-white/[0.09] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            aria-label="Open search (press slash)"
+            className="group inline-flex size-11 items-center justify-center rounded-full bg-white/[0.05] text-text-secondary ring-1 ring-white/10 transition hover:bg-white/[0.09] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <Search aria-hidden className="size-4" />
           </Link>
+          <span
+            aria-hidden
+            className="hidden select-none rounded-md border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-semibold text-text-muted xl:inline-flex"
+            title="Press / to search"
+          >
+            /
+          </span>
+          <span
+            aria-hidden
+            className="hidden select-none items-center gap-1 rounded-md border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-semibold text-text-muted xl:inline-flex"
+            title="Press Ctrl or Cmd + K to open the command palette"
+          >
+            <kbd>⌘</kbd>
+            <kbd>K</kbd>
+          </span>
 
           {isRestoring ? (
             <span className="inline-flex h-11 w-28 items-center justify-center rounded-full bg-white/[0.05] text-sm font-semibold text-text-muted ring-1 ring-white/10">

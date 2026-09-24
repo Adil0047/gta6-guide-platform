@@ -8,6 +8,7 @@ export function SearchPage() {
       <SEO
         title="Search GTA VI Guides"
         description="Search GTA VI guides by missions, map locations, vehicles, money, secrets, categories, difficulty, and guide type."
+        noIndex
       />
       <main id="main-content" className="py-14 sm:py-20">
         <Container>

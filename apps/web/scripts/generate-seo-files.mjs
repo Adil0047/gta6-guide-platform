@@ -7,6 +7,7 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(scriptDir, '..');
 const publicDir = resolve(webRoot, 'public');
 const envFile = resolve(webRoot, '.env');
+const seoRoutesPath = resolve(webRoot, 'seo-routes.config.json');
 
 function readEnvFile() {
   try {
@@ -27,19 +28,26 @@ function readEnvFile() {
 
 const fileEnv = readEnvFile();
 const siteUrl = (process.env.VITE_SITE_URL ?? fileEnv.VITE_SITE_URL ?? 'http://localhost:5173').replace(/\/$/, '');
-const routes = [
-  { path: '/', changefreq: 'daily', priority: '1.0' },
-  { path: '/guides', changefreq: 'daily', priority: '0.9' },
-  { path: '/categories', changefreq: 'weekly', priority: '0.8' },
-  { path: '/search', changefreq: 'weekly', priority: '0.6' },
-  { path: '/map', changefreq: 'weekly', priority: '0.7' },
-];
+
+if (!process.env.VITE_SITE_URL && !fileEnv.VITE_SITE_URL) {
+  process.stderr.write(
+    '[generate-seo-files] VITE_SITE_URL is not set — robots.txt and sitemap.xml will use http://localhost:5173. Set VITE_SITE_URL in your Vercel project env (or apps/web/.env) before building for production.\n',
+  );
+}
+
+// Single source of truth: apps/web/seo-routes.config.json (shared with the
+// AdminSeoPanel client component to prevent config drift).
+const seoConfig = JSON.parse(readFileSync(seoRoutesPath, 'utf8'));
+const routes = seoConfig.indexableRoutes;
+const disallowedPaths = seoConfig.disallowedPaths;
 
 mkdirSync(publicDir, { recursive: true });
+
 writeFileSync(
   resolve(publicDir, 'robots.txt'),
-  `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`,
+  `User-agent: *\n${disallowedPaths.map((path) => `Disallow: ${path}`).join('\n')}\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`,
 );
+
 writeFileSync(
   resolve(publicDir, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes

@@ -114,3 +114,97 @@ canvas {
     transition-duration: 1ms !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Print stylesheet — produces a clean, readable printed guide.
+ * Hides navigation, footer, back-to-top, table of contents, reading
+ * progress, share/print chrome, hero background imagery, and the
+ * interactive map/comment surfaces. Forces a high-contrast black-on-white
+ * palette and expands the article to full width.
+ * ------------------------------------------------------------------------- */
+@media print {
+  :root {
+    color-scheme: light;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+  }
+
+  /* Force light-mode surface colors for print legibility */
+  *,
+  *::before,
+  *::after {
+    color: #000000 !important;
+    background-color: transparent !important;
+    border-color: #999999 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Hide interactive / decorative chrome */
+  header,
+  footer,
+  nav,
+  aside,
+  [data-print-hidden],
+  [aria-label="Primary navigation"],
+  [aria-label="Breadcrumb"],
+  [role="progressbar"],
+  [role="search"],
+  button {
+    display: none !important;
+  }
+
+  /* Remove hero background imagery overlays */
+  img[aria-hidden="true"],
+  .pointer-events-none {
+    display: none !important;
+  }
+
+  /* Expand the main article to full width and remove rounded panels */
+  main {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  article,
+  section {
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 0 1rem 0 !important;
+    background: #ffffff !important;
+    break-inside: avoid;
+  }
+
+  /* Ensure headings print boldly */
+  h1,
+  h2,
+  h3 {
+    font-weight: 800 !important;
+    break-after: avoid;
+  }
+
+  /* Keep links readable (show the URL for external links) */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #444444 !important;
+  }
+
+  /* Avoid awkward page breaks inside guide sections / cards */
+  [id^="guide-"],
+  .break-avoid {
+    break-inside: avoid;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1.5cm 1.75cm;
+  }
+}

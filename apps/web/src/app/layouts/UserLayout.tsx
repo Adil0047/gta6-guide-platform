@@ -1,16 +1,22 @@
 import { Outlet } from 'react-router';
 
+import { CommandPalette } from '@/components/common';
 import { Footer, Navbar } from '@/components/layout';
 import { DashboardNav } from '@/components/layout/DashboardNav';
 import { Container } from '@/components/ui/Container';
 import { SkipLink } from '@/components/navigation';
+import { useCommandPalette, useContextCommands, useSearchShortcut } from '@/hooks';
 
 export function UserLayout() {
+  useSearchShortcut();
+  const { open, close } = useCommandPalette();
+  const extraCommands = useContextCommands('dashboard', close);
+
   return (
-    <div className="min-h-screen bg-background text-text-primary">
+    <div className="flex min-h-screen flex-col bg-background text-text-primary">
       <SkipLink />
       <Navbar />
-      <main id="main-content" className="py-12 sm:py-16">
+      <main id="main-content" className="flex-1 py-12 sm:py-16">
         <Container>
           <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
             <DashboardNav />
@@ -19,6 +25,7 @@ export function UserLayout() {
         </Container>
       </main>
       <Footer />
+      <CommandPalette open={open} onClose={close} extraCommands={extraCommands} />
     </div>
   );
 }
