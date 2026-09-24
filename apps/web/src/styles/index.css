@@ -76,6 +76,39 @@ body {
   color: #ffffff;
 }
 
+/* ---------------------------------------------------------------------------
+ * Site-wide fixed background — the original hero-banner image stays fixed
+ * behind all content as you scroll. A dark overlay + neon gradients on top
+ * keep text readable. Uses a ::before pseudo-element so the image is
+ * fixed-position without affecting layout.
+ * ------------------------------------------------------------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: url("/images/hero-banner-original.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* Darkening so the image is atmospheric, not distracting */
+  filter: brightness(0.32) saturate(1.2);
+  pointer-events: none;
+}
+
+/* Neon gradient overlay on top of the fixed image — adds vibrancy + depth */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 60, 172, 0.18), transparent 40rem),
+    radial-gradient(circle at 85% 15%, rgba(0, 229, 255, 0.15), transparent 38rem),
+    radial-gradient(circle at 50% 95%, rgba(124, 58, 237, 0.14), transparent 42rem);
+  pointer-events: none;
+}
+
 /* Display-font utility for hero/card headings — tighter tracking, condensed feel */
 .font-display {
   font-family: var(--font-display);
@@ -241,6 +274,12 @@ canvas {
     background: #ffffff !important;
     color: #000000 !important;
     overflow: visible !important;
+  }
+
+  /* Hide the fixed site-wide background image + neon overlay in print */
+  body::before,
+  body::after {
+    display: none !important;
   }
 
   /* Force light-mode surface colors for print legibility */
