@@ -2,7 +2,7 @@ import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 
 import { cn } from '@/utils/cn';
 
-type ButtonVariant = 'primary' | 'ghost' | 'icon';
+type ButtonVariant = 'primary' | 'neon' | 'ghost' | 'icon';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
@@ -12,6 +12,8 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
     'bg-white text-black shadow-[0_0_32px_rgba(255,60,172,0.22)] hover:bg-text-secondary focus-visible:ring-neon-pink',
+  neon:
+    'bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan text-white shadow-[0_0_32px_rgba(255,60,172,0.35)] hover:shadow-[0_0_44px_rgba(0,229,255,0.4)] hover:brightness-110 focus-visible:ring-neon-cyan',
   ghost:
     'bg-white/5 text-text-primary ring-1 ring-white/10 hover:bg-white/10 hover:ring-white/20 focus-visible:ring-neon-cyan',
   icon:

@@ -72,6 +72,14 @@ export function Navbar({ className }: NavbarProps) {
         className,
       )}
     >
+      {/* Neon accent line at the bottom of the navbar — intensifies on scroll */}
+      <span
+        aria-hidden
+        className={cn(
+          'pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-neon-cyan/60 to-transparent transition-opacity duration-300',
+          hasScrolled ? 'opacity-100' : 'opacity-40',
+        )}
+      />
       <nav
         aria-label="Primary navigation"
         className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"

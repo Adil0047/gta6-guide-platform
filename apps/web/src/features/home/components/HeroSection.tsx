@@ -22,13 +22,29 @@ export function HeroSection() {
       </div>
 
       {/* Darkening layer — keeps text readable without killing the image */}
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-black/40" />
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-black/45" />
+
+      {/* Cinematic gradient mesh overlay — pink/cyan/purple atmospheric depth */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-20"
+        style={{
+          background:
+            'radial-gradient(circle at 18% 30%, rgba(255,60,172,0.22), transparent 45%), radial-gradient(circle at 82% 20%, rgba(0,229,255,0.18), transparent 42%), radial-gradient(circle at 50% 90%, rgba(124,58,237,0.16), transparent 50%)',
+        }}
+      />
+
+      {/* Scanline accent — thin neon line that reads as "game UI" */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-24 -z-10 h-px bg-gradient-to-r from-transparent via-neon-cyan/50 to-transparent neon-pulse"
+      />
 
       {/* Bottom fade into the page */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-gradient-to-t from-background via-background/70 to-transparent" />
 
       {/* Subtle side vignette */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
 
       {/* Existing atmospheric glow */}
       <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-neon-pink/10 blur-3xl" />
@@ -44,12 +60,12 @@ export function HeroSection() {
             </Badge>
           </FadeIn>
 
-          {/* Main heading */}
+          {/* Main heading — display font + neon glow on the gradient span */}
           <FadeIn delay={0.08}>
-            <h1 className="mt-7 text-balance text-5xl font-black tracking-tight text-white drop-shadow-2xl sm:text-6xl lg:text-7xl">
+            <h1 className="font-display mt-7 text-balance text-5xl font-black tracking-tight text-white drop-shadow-2xl sm:text-6xl lg:text-7xl">
               Everything you need to
               <br />
-              <span className="bg-gradient-to-r from-neon-pink via-white to-neon-cyan bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-neon-pink via-white to-neon-cyan bg-clip-text text-transparent text-glow-pink">
                 conquer GTA VI.
               </span>
             </h1>
@@ -71,12 +87,12 @@ export function HeroSection() {
             </div>
           </FadeIn>
 
-          {/* CTA buttons */}
+          {/* CTA buttons — primary uses the neon gradient variant */}
           <FadeIn delay={0.32}>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link to={ROUTES.guides}>
-                <Button>
-                  <span className="text-black">Explore guides</span>
+                <Button variant="neon">
+                  <span className="text-white">Explore guides</span>
                   <ArrowRight aria-hidden className="ml-2 size-4" />
                 </Button>
               </Link>
@@ -91,13 +107,14 @@ export function HeroSection() {
           </FadeIn>
         </div>
 
-        {/* Feature cards */}
+        {/* Feature cards — stat strip with divider accents */}
         <ScaleIn delay={0.42}>
           <div className="mx-auto mt-16 grid max-w-5xl gap-4 sm:grid-cols-3">
             <Link
               to={ROUTES.guides}
-              className="group rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md transition hover:border-neon-pink/40 hover:bg-white/[0.06]"
+              className="group relative overflow-hidden rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-neon-pink/40 hover:bg-white/[0.06]"
             >
+              <span aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-neon-pink to-transparent opacity-60 transition-opacity group-hover:opacity-100" />
               <span className="grid size-11 place-items-center rounded-2xl border border-neon-pink/20 bg-neon-pink/10 text-neon-pink">
                 <BookOpen aria-hidden className="size-6" />
               </span>
@@ -111,8 +128,9 @@ export function HeroSection() {
 
             <Link
               to={ROUTES.search}
-              className="group rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md transition hover:border-neon-cyan/40 hover:bg-white/[0.06]"
+              className="group relative overflow-hidden rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-neon-cyan/40 hover:bg-white/[0.06]"
             >
+              <span aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-60 transition-opacity group-hover:opacity-100" />
               <span className="grid size-11 place-items-center rounded-2xl border border-neon-cyan/20 bg-neon-cyan/10 text-neon-cyan">
                 <Search aria-hidden className="size-6" />
               </span>
@@ -126,8 +144,9 @@ export function HeroSection() {
 
             <Link
               to={ROUTES.map}
-              className="group rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md transition hover:border-neon-purple/40 hover:bg-white/[0.06]"
+              className="group relative overflow-hidden rounded-card border border-white/10 bg-black/25 p-5 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-neon-purple/40 hover:bg-white/[0.06]"
             >
+              <span aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-neon-purple to-transparent opacity-60 transition-opacity group-hover:opacity-100" />
               <span className="grid size-11 place-items-center rounded-2xl border border-neon-purple/20 bg-neon-purple/10 text-neon-purple">
                 <Map aria-hidden className="size-6" />
               </span>
