@@ -1,8 +1,10 @@
 import { SEO } from '@/components/common';
 import { Container } from '@/components/ui/Container';
 import { CategoryHeroGrid } from '@/features/categories';
+import { usePageBackground } from '@/hooks';
 
 export function CategoriesPage() {
+  usePageBackground('categories');
   return (
     <>
       <SEO

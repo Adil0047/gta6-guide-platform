@@ -1,6 +1,7 @@
 import { SEO } from '@/components/common';
 import { faqs } from '@/data';
 import { SITE_CONFIG } from '@/constants/site';
+import { usePageBackground } from '@/hooks';
 import {
   CategoryPreviewSection,
   FaqSection,
@@ -12,6 +13,7 @@ import {
 } from '@/features/home';
 
 export function HomePage() {
+  usePageBackground('home');
   return (
     <>
       <SEO

@@ -1,8 +1,10 @@
 import { SEO } from '@/components/common';
 import { Container } from '@/components/ui/Container';
 import { GuideListing } from '@/features/guides';
+import { usePageBackground } from '@/hooks';
 
 export function GuidesPage() {
+  usePageBackground('guides');
   return (
     <>
       <SEO

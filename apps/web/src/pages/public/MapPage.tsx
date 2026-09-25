@@ -4,8 +4,10 @@ import { mapLocations } from '@/data';
 import { MapExperience } from '@/features/map';
 import { ROUTES } from '@/constants/routes';
 import { SITE_CONFIG } from '@/constants/site';
+import { usePageBackground } from '@/hooks';
 
 export function MapPage() {
+  usePageBackground('map');
   const structuredData = [
     {
       '@context': 'https://schema.org',
