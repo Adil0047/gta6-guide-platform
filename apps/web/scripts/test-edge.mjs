@@ -109,7 +109,7 @@ const N = (name) => `${name} | ${DEFAULT_SITE_NAME}`;
 const tests = [
   ['/', {
     title: N('GTA VI Guides, Map &amp; Walkthroughs'),
-    robots: 'index,follow',
+    robots: 'index,follow,max-image-preview:large',
     canonical: SITE_URL,
     ogType: 'website',
     ogImage: `${SITE_URL}/og-image.jpg`,
@@ -119,7 +119,7 @@ const tests = [
   }],
   ['/guides', {
     title: N('GTA VI Guides'),
-    robots: 'index,follow',
+    robots: 'index,follow,max-image-preview:large',
     canonical: `${SITE_URL}/guides`,
     ogType: 'website',
     jsonLdCount: 0,

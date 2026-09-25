@@ -59,89 +59,101 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ---------------------------------------------------------------------------
+ * Site-wide fixed background — the background image is set DIRECTLY on the
+ * body element using background-attachment: fixed (the most reliable
+ * cross-browser method for fixed backgrounds). No pseudo-elements, no
+ * z-index hacks. The image sits behind all content naturally.
+ *
+ * Per-page switching: the `data-bg` attribute on <body> (set by the
+ * usePageBackground hook) selects which image to show. The neon gradient
+ * overlays are layered on top using multiple background layers.
+ * ------------------------------------------------------------------------- */
 body {
   min-height: 100%;
   margin: 0;
   overflow-x: hidden;
-  /* Transparent so the fixed body::before background image shows through.
-     The neon mesh + grid texture layer on top via body::after. */
-  background: transparent;
   color: #ffffff;
-}
-
-/* ---------------------------------------------------------------------------
- * Per-page fixed backgrounds — uses all generated images + the original
- * hero banner. Each page sets `data-bg="<key>"` on <body> via the
- * usePageBackground hook, which selects the background image.
- *
- * LAYERING (bottom → top):
- *   body::before  (z-index: -2)  → the background IMAGE (fixed, visible)
- *   body::after   (z-index: -1)  → neon gradient + grid texture overlay
- *   body content  (z-index: 0+)  → page content (cards, text, etc.)
- *
- * The body itself is transparent (above) so ::before is visible. The image
- * is darkened just enough for text readability but bright enough to see.
- * ------------------------------------------------------------------------- */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  /* Darkened but visible — brightness 0.5 keeps the image readable behind
-     content while still being clearly visible. Saturate boosts the neon. */
-  filter: brightness(0.5) saturate(1.3);
-  pointer-events: none;
-  /* Default = the original hero banner */
-  background-image: url("/images/hero-banner-original.jpg");
-}
-
-/* Per-page background selection via data-bg attribute on <body> */
-body[data-bg="home"]::before {
-  background-image: url("/images/bg-home.jpg");
-}
-body[data-bg="guides"]::before {
-  background-image: url("/images/bg-guides.jpg");
-}
-body[data-bg="map"]::before {
-  background-image: url("/images/bg-map.jpg");
-}
-body[data-bg="categories"]::before {
-  background-image: url("/images/bg-guides.jpg");
-}
-body[data-bg="default"]::before {
-  background-image: url("/images/hero-banner-original.jpg");
-}
-
-/* Mobile override — portrait-optimized background for small screens */
-@media (max-width: 767px) {
-  body::before {
-    background-image: url("/images/bg-mobile.jpg");
-    background-position: center top;
-  }
-}
-
-/* Neon gradient + grid texture overlay — adds vibrancy + depth on top of
-   the image but behind content. Semi-transparent so the image shows through. */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    /* Neon atmospheric mesh */
+  /* Background image (fixed) + neon overlays layered in one property.
+     Order matters: first layer is on TOP, last layer is on BOTTOM.
+     So: neon mesh → grid → dark vignette → IMAGE (bottom). */
+  background-image:
+    /* Neon atmospheric mesh (semi-transparent, on top of image) */
     radial-gradient(circle at 15% 20%, rgba(255, 60, 172, 0.15), transparent 40rem),
     radial-gradient(circle at 85% 15%, rgba(0, 229, 255, 0.12), transparent 38rem),
     radial-gradient(circle at 50% 95%, rgba(124, 58, 237, 0.12), transparent 42rem),
     /* Subtle grid texture */
     linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    /* Dark gradient at top + bottom for navbar/footer readability */
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 20%, transparent 80%, rgba(0, 0, 0, 0.4) 100%);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 44px 44px, 44px 44px, 100% 100%;
-  pointer-events: none;
+    /* Dark vignette top + bottom for navbar/footer readability */
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 15%, transparent 85%, rgba(0, 0, 0, 0.5) 100%),
+    /* THE BACKGROUND IMAGE — bottom layer, fixed */
+    url("/images/hero-banner-original.jpg");
+  background-size: 100% 100%, 100% 100%, 100% 100%, 44px 44px, 44px 44px, 100% 100%, cover;
+  background-position: center, center, center, center, center, center, center;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat, no-repeat;
+  background-attachment: fixed, fixed, fixed, fixed, fixed, fixed, fixed;
+}
+
+/* Per-page background selection — only overrides the image layer (bottom) */
+body[data-bg="home"] {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(255, 60, 172, 0.15), transparent 40rem),
+    radial-gradient(circle at 85% 15%, rgba(0, 229, 255, 0.12), transparent 38rem),
+    radial-gradient(circle at 50% 95%, rgba(124, 58, 237, 0.12), transparent 42rem),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 15%, transparent 85%, rgba(0, 0, 0, 0.5) 100%),
+    url("/images/hero-banner-original.jpg");
+}
+body[data-bg="guides"] {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(0, 229, 255, 0.15), transparent 40rem),
+    radial-gradient(circle at 85% 15%, rgba(255, 60, 172, 0.12), transparent 38rem),
+    radial-gradient(circle at 50% 95%, rgba(124, 58, 237, 0.12), transparent 42rem),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 15%, transparent 85%, rgba(0, 0, 0, 0.5) 100%),
+    url("/images/bg-guides.jpg");
+}
+body[data-bg="map"] {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(124, 58, 237, 0.15), transparent 40rem),
+    radial-gradient(circle at 85% 15%, rgba(0, 229, 255, 0.12), transparent 38rem),
+    radial-gradient(circle at 50% 95%, rgba(255, 60, 172, 0.12), transparent 42rem),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 15%, transparent 85%, rgba(0, 0, 0, 0.5) 100%),
+    url("/images/bg-map.jpg");
+}
+body[data-bg="categories"] {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(0, 229, 255, 0.15), transparent 40rem),
+    radial-gradient(circle at 85% 15%, rgba(255, 60, 172, 0.12), transparent 38rem),
+    radial-gradient(circle at 50% 95%, rgba(124, 58, 237, 0.12), transparent 42rem),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 15%, transparent 85%, rgba(0, 0, 0, 0.5) 100%),
+    url("/images/bg-guides.jpg");
+}
+
+/* Mobile override — portrait-optimized background */
+@media (max-width: 767px) {
+  body,
+  body[data-bg="home"],
+  body[data-bg="guides"],
+  body[data-bg="map"],
+  body[data-bg="categories"] {
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(255, 60, 172, 0.15), transparent 40rem),
+      radial-gradient(circle at 85% 15%, rgba(0, 229, 255, 0.12), transparent 38rem),
+      radial-gradient(circle at 50% 95%, rgba(124, 58, 237, 0.12), transparent 42rem),
+      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 15%, transparent 85%, rgba(0, 0, 0, 0.5) 100%),
+      url("/images/bg-mobile.jpg");
+    background-position: center, center, center, center, center, center, center top;
+  }
 }
 
 /* Display-font utility for hero/card headings — tighter tracking, condensed feel */
@@ -157,6 +169,28 @@ body::after {
 }
 .text-glow-cyan {
   text-shadow: 0 0 24px rgba(0, 229, 255, 0.4);
+}
+
+/* ---------------------------------------------------------------------------
+ * Readability scrims — semi-transparent dark backdrops for content areas
+ * so text stays readable over the fixed background images.
+ * ------------------------------------------------------------------------- */
+
+/* Text shadow utility for headings sitting directly over background images */
+.text-scrim {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Section-level darkening — apply to <main> or section wrappers */
+.content-scrim {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+/* Card readability — stronger backdrop for cards over busy backgrounds */
+.card-scrim {
+  background-color: rgba(8, 8, 11, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 /* Animated gradient border accent for navbar / hero dividers */
@@ -307,14 +341,9 @@ canvas {
   html,
   body {
     background: #ffffff !important;
+    background-image: none !important;
     color: #000000 !important;
     overflow: visible !important;
-  }
-
-  /* Hide the fixed site-wide background image + neon overlay in print */
-  body::before,
-  body::after {
-    display: none !important;
   }
 
   /* Force light-mode surface colors for print legibility */

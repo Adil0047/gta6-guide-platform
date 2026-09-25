@@ -10,7 +10,7 @@ export function AdminLayout() {
   const extraCommands = useContextCommands('admin', close);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-text-primary">
+    <div className="flex min-h-screen flex-col bg-transparent text-text-primary">
       <SkipLink />
       <div className="flex-1 lg:grid lg:grid-cols-[18rem_1fr]">
         <AdminSidebar />

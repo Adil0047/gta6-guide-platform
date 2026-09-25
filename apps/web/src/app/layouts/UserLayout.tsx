@@ -13,7 +13,7 @@ export function UserLayout() {
   const extraCommands = useContextCommands('dashboard', close);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-text-primary">
+    <div className="flex min-h-screen flex-col bg-transparent text-text-primary">
       <SkipLink />
       <Navbar />
       <main id="main-content" className="flex-1 py-12 sm:py-16">

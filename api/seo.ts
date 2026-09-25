@@ -223,7 +223,9 @@ function buildMetaTags(meta: RouteMeta, siteUrl: string, pathname: string): stri
   const canonical = `${siteUrl}${pathname === '/' ? '' : pathname}`;
   const ogImage = `${siteUrl}${DEFAULT_OG_IMAGE_PATH}`;
   const ogType = meta.type ?? 'website';
-  const robotsContent = meta.noIndex ? 'noindex,nofollow' : 'index,follow';
+  const robotsContent = meta.noIndex
+    ? 'noindex,nofollow'
+    : 'index,follow,max-image-preview:large';
 
   const tags: string[] = [
     `<title>${escapeHtml(fullTitle)}</title>`,

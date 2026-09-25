@@ -12,16 +12,16 @@ export function CategoriesPage() {
         description="Browse GTA VI guides by missions, map locations, vehicles, characters, weapons, money, secrets, and online content."
         canonicalUrl="/categories"
       />
-      <main id="main-content" className="py-14 sm:py-20">
+      <main id="main-content" className="content-scrim py-14 sm:py-20">
         <Container>
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-neon-pink">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-neon-pink text-scrim">
               Categories
             </p>
-            <h1 className="mt-5 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 className="text-scrim mt-5 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
               Find guides by gameplay system.
             </h1>
-            <p className="mt-6 text-base leading-8 text-text-secondary sm:text-lg">
+            <p className="text-scrim mt-6 text-base leading-8 text-text-secondary sm:text-lg">
               Every major GTA VI content area is organized into clean, scalable categories for fast
               discovery.
             </p>

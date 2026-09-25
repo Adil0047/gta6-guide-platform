@@ -17,6 +17,10 @@ export function HeroSection() {
           src="/images/hero-banner.jpg"
           alt=""
           aria-hidden="true"
+          width={1344}
+          height={768}
+          fetchPriority="high"
+          decoding="async"
           className="ken-burns h-full w-full object-cover object-center"
         />
       </div>

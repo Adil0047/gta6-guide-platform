@@ -11,7 +11,7 @@ export function PublicLayout() {
   const { open, close } = useCommandPalette();
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-text-primary">
+    <div className="flex min-h-screen flex-col bg-transparent text-text-primary">
       <SkipLink />
       <Navbar />
       <div className="flex-1">

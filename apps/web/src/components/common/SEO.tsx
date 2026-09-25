@@ -86,7 +86,9 @@ export function SEO({
     const pageTitle = createPageTitle(title);
     const canonical = getAbsoluteUrl(canonicalUrl) ?? window.location.href;
     const socialImage = getAbsoluteUrl(image) ?? SITE_CONFIG.defaultImage;
-    const robotsContent = noIndex ? 'noindex,nofollow' : 'index,follow';
+    const robotsContent = noIndex
+      ? 'noindex,nofollow'
+      : 'index,follow,max-image-preview:large';
 
     document.title = pageTitle;
 

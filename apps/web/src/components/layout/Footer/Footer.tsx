@@ -30,7 +30,7 @@ export function Footer() {
   const [cookiePrefsOpen, setCookiePrefsOpen] = useState(false);
 
   return (
-    <footer className="mt-auto border-t border-white/10 bg-background/90 py-14 text-text-secondary">
+    <footer className="card-scrim mt-auto border-t border-white/10 py-14 text-text-secondary">
       <CookiePreferencesDialog open={cookiePrefsOpen} onClose={() => setCookiePrefsOpen(false)} />
       <Container>
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
